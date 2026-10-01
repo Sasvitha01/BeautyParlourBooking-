@@ -1,0 +1,188 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Overview{% endblock %}
+{% block dashboard_title %}Dashboard Overview{% endblock %}
+
+{% block dashboard_content %}
+<!-- Stats Row -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">📅</div>
+        <div class="stat-content">
+            <h3>Today's Bookings</h3>
+            <div class="stat-number">{{ stats.today_appointments }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon warning">⏳</div>
+        <div class="stat-content">
+            <h3>Pending Confirmation</h3>
+            <div class="stat-number">{{ stats.pending }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon info">✨</div>
+        <div class="stat-content">
+            <h3>Confirmed Sessions</h3>
+            <div class="stat-number">{{ stats.confirmed }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon success">✅</div>
+        <div class="stat-content">
+            <h3>Completed Sessions</h3>
+            <div class="stat-number">{{ stats.completed }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon primary">👥</div>
+        <div class="stat-content">
+            <h3>Total Clients</h3>
+            <div class="stat-number">{{ stats.total_customers }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon info">💇‍♀️</div>
+        <div class="stat-content">
+            <h3>Active Services</h3>
+            <div class="stat-number">{{ stats.total_services }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Schedule -->
+<div class="dashboard-card">
+    <div class="dashboard-card-header">
+        <h2>Today's Appointments</h2>
+        <a href="{% url 'dashboard:appointments' %}?date={{ stats.today_appointments_date }}" class="btn btn-secondary btn-sm">
+            View All Appointments →
+        </a>
+    </div>
+    <div class="dashboard-card-body" style="padding: 0;">
+        {% if today_appointments %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Ref ID</th>
+                        <th>Client</th>
+                        <th>Phone</th>
+                        <th>Service</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in today_appointments %}
+                    <tr>
+                        <td><strong>{{ appt.time_display }}</strong></td>
+                        <td>
+                            <a href="{% url 'dashboard:appointment_detail' appt.booking_id %}" style="font-family: monospace; font-weight: 600;">
+                                {{ appt.booking_id }}
+                            </a>
+                        </td>
+                        <td>{{ appt.customer.full_name }}</td>
+                        <td>{{ appt.customer.phone }}</td>
+                        <td>{{ appt.service.name }}</td>
+                        <td>
+                            <span class="status-badge status-{{ appt.status }}">
+                                {{ appt.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'dashboard:appointment_detail' appt.booking_id %}" class="btn btn-secondary btn-sm">
+                                Manage
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">☕</div>
+            <h3>No Appointments Scheduled Today</h3>
+            <p>Any bookings made for today will show up here automatically.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Upcoming Appointments -->
+<div class="dashboard-card">
+    <div class="dashboard-card-header">
+        <h2>Upcoming Appointments (Next Up)</h2>
+        <a href="{% url 'dashboard:appointments' %}" class="btn btn-secondary btn-sm">All Bookings</a>
+    </div>
+    <div class="dashboard-card-body" style="padding: 0;">
+        {% if upcoming %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Ref ID</th>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Fee</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in upcoming %}
+                    <tr>
+                        <td>
+                            <strong>{{ appt.appointment_date|date:"M j, Y" }}</strong>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">{{ appt.time_display }}</div>
+                        </td>
+                        <td>
+                            <a href="{% url 'dashboard:appointment_detail' appt.booking_id %}" style="font-family: monospace; font-weight: 600;">
+                                {{ appt.booking_id }}
+                            </a>
+                        </td>
+                        <td>
+                            <div>{{ appt.customer.full_name }}</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">{{ appt.customer.phone }}</div>
+                        </td>
+                        <td>{{ appt.service.name }}</td>
+                        <td>{{ appt.service.price_display }}</td>
+                        <td>
+                            <span class="status-badge status-{{ appt.status }}">
+                                {{ appt.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="table-actions" style="justify-content: flex-end;">
+                                {% if appt.can_confirm %}
+                                <form method="post" action="{% url 'dashboard:appointment_action' appt.booking_id 'confirm' %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm" title="Confirm Booking">Confirm</button>
+                                </form>
+                                {% endif %}
+                                <a href="{% url 'dashboard:appointment_detail' appt.booking_id %}" class="btn btn-secondary btn-sm">Details</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <h3>No Upcoming Appointments</h3>
+            <p>New customer bookings will appear here in chronological order.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

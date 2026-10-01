@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header / Breadcrumbs -->
+<section class="page-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'appointments:home' %}">Home</a>
+            <span class="separator">/</span>
+            <a href="{% url 'services:service_list' %}">Services</a>
+            <span class="separator">/</span>
+            <a href="{% url 'services:service_list' %}?category={{ service.category.slug }}">{{ service.category.name }}</a>
+            <span class="separator">/</span>
+            <span>{{ service.name }}</span>
+        </div>
+        <h1>{{ service.name }}</h1>
+        <p>{{ service.category.name }} Treatment at GlowNest Beauty Studio</p>
+    </div>
+</section>
+
+<!-- Service Details Section -->
+<section class="section service-detail-page">
+    <div class="container">
+        <div class="service-detail-grid">
+            <div class="service-detail-image">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" alt="{{ service.name }}">
+                {% else %}
+                <span>{{ service.category.icon|default:"✨" }}</span>
+                {% endif %}
+            </div>
+            <div class="service-detail-info">
+                <div class="card-category" style="font-size: 0.9rem; margin-bottom: var(--space-xs);">
+                    {{ service.category.name }}
+                </div>
+                <h1>{{ service.name }}</h1>
+                
+                <div class="service-detail-price">
+                    {{ service.price_display }}
+                </div>
+
+                <div class="service-detail-meta">
+                    <div class="service-detail-meta-item">
+                        <span class="meta-icon">⏱️</span>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase;">Duration</div>
+                            <span class="meta-value">{{ service.duration_display }}</span>
+                        </div>
+                    </div>
+                    <div class="service-detail-meta-item">
+                        <span class="meta-icon">🏷️</span>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase;">Category</div>
+                            <span class="meta-value">{{ service.category.name }}</span>
+                        </div>
+                    </div>
+                    <div class="service-detail-meta-item">
+                        <span class="meta-icon">✨</span>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase;">Status</div>
+                            <span class="meta-value" style="color: var(--color-success);">Available for Booking</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-detail-description">
+                    <h3 style="font-size: 1.15rem; margin-bottom: var(--space-sm); color: var(--color-accent-dark);">Service Overview</h3>
+                    <p>{{ service.description|linebreaks }}</p>
+                </div>
+
+                <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+                    <a href="{% url 'appointments:book_appointment' %}?service={{ service.slug }}" class="btn btn-primary btn-lg">
+                        Book This Service
+                    </a>
+                    <a href="https://wa.me/{{ whatsapp_number|cut:'+' }}?text=Hi%20GlowNest!%20I'm%20interested%20in%20{{ service.name|urlencode }}." 
+                       target="_blank" rel="noopener" class="btn btn-secondary btn-lg">
+                        💬 Ask on WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Services -->
+        {% if related_services %}
+        <div style="margin-top: var(--space-4xl);">
+            <div class="section-header" style="text-align: left; margin-bottom: var(--space-xl);">
+                <div class="section-accent"></div>
+                <h2>Other {{ service.category.name }} Services</h2>
+                <p class="section-subtitle" style="margin: 0;">Complementary treatments you might love</p>
+            </div>
+            <div class="service-grid">
+                {% for related in related_services %}
+                <div class="card">
+                    <a href="{{ related.get_absolute_url }}" style="text-decoration: none; color: inherit; display: block;">
+                        {% if related.image %}
+                        <img src="{{ related.image.url }}" alt="{{ related.name }}" class="card-image">
+                        {% else %}
+                        <div class="card-image-placeholder">
+                            {{ related.category.icon|default:"✨" }}
+                        </div>
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <div class="card-category">{{ related.category.name }}</div>
+                        <h3 class="card-title">
+                            <a href="{{ related.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                                {{ related.name }}
+                            </a>
+                        </h3>
+                        <div class="card-meta">
+                            <div class="card-meta-item">
+                                <span class="meta-icon">⏱️</span>
+                                <span>{{ related.duration_display }}</span>
+                            </div>
+                            <div class="card-price">{{ related.price_display }}</div>
+                        </div>
+                        <div style="margin-top: var(--space-md);">
+                            <a href="{% url 'appointments:book_appointment' %}?service={{ related.slug }}" class="btn btn-primary btn-sm" style="width: 100%;">
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

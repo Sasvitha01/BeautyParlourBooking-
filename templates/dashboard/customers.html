@@ -1,0 +1,92 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Customer Directory{% endblock %}
+{% block dashboard_title %}Customer Directory{% endblock %}
+
+{% block dashboard_content %}
+<!-- Search Bar -->
+<div class="dashboard-card" style="margin-bottom: var(--space-xl);">
+    <div class="dashboard-card-body">
+        <form method="get" class="filters-bar" style="margin: 0;">
+            <div class="filter-group" style="flex: 1;">
+                <label for="search-customer">Search Clients</label>
+                <input type="text" id="search-customer" name="search" value="{{ search }}" placeholder="Search by name, phone number, or email...">
+            </div>
+            <div style="display: flex; gap: var(--space-xs); align-items: flex-end;">
+                <button type="submit" class="btn btn-primary btn-sm" style="height: 38px;">Search</button>
+                {% if search %}
+                <a href="{% url 'dashboard:customers' %}" class="btn btn-secondary btn-sm" style="height: 38px;">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Customer Table Card -->
+<div class="dashboard-card">
+    <div class="dashboard-card-header">
+        <h2>
+            Clients ({{ customers|length }})
+        </h2>
+    </div>
+    <div class="dashboard-card-body" style="padding: 0;">
+        {% if customers %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Phone Number</th>
+                        <th>Email Address</th>
+                        <th>Total Bookings</th>
+                        <th>First Booking</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">{{ customer.full_name }}</div>
+                        </td>
+                        <td>
+                            📞 <a href="tel:{{ customer.phone }}">{{ customer.phone }}</a>
+                        </td>
+                        <td>
+                            ✉️ <a href="mailto:{{ customer.email }}">{{ customer.email }}</a>
+                        </td>
+                        <td>
+                            <span class="status-badge status-confirmed">
+                                {{ customer.appt_count }} booking{{ customer.appt_count|pluralize }}
+                            </span>
+                        </td>
+                        <td>
+                            {{ customer.created_at|date:"M j, Y" }}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="table-actions" style="justify-content: flex-end;">
+                                <a href="{% url 'dashboard:appointments' %}?search={{ customer.phone }}" class="btn btn-secondary btn-sm" title="View customer appointments">
+                                    View History
+                                </a>
+                                <a href="https://wa.me/{{ customer.phone|cut:'+' }}?text=Hi%20{{ customer.full_name|urlencode }}!%20Greeting%20from%20GlowNest%20Beauty%20Studio." 
+                                   target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="color: #25d366; border-color: #25d366;">
+                                    💬 Chat
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <h3>No Clients Found</h3>
+            <p>{% if search %}No clients match "{{ search }}". Try a different search term.{% else %}When customers book appointments, they will appear here.{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

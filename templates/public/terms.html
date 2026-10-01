@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms & Booking Policy{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'appointments:home' %}">Home</a>
+            <span class="separator">/</span>
+            <span>Terms & Policy</span>
+        </div>
+        <h1>Terms & Booking Policy</h1>
+        <p>Guidelines to ensure a seamless and delightful salon experience for every client.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="legal-content">
+            <p>Last updated: October 2026</p>
+            <p>Welcome to GlowNest Beauty Studio. By using our website and booking our beauty services, you agree to comply with and be bound by the following studio policies and terms of service.</p>
+
+            <h2>1. Booking & Scheduling</h2>
+            <ul>
+                <li>Appointments can be booked online up to 90 days in advance.</li>
+                <li>Upon successful scheduling, you will receive a unique Booking Reference ID (e.g. <code>GNS-2026-XXXXX</code>). Please save this ID to track or manage your appointment.</li>
+                <li>All bookings are subject to studio confirmation. In rare instances of schedule conflicts, our front desk will promptly reach out to offer an alternative slot.</li>
+            </ul>
+
+            <h2>2. Arrival & Punctuality</h2>
+            <ul>
+                <li>We request clients to arrive at least <strong>10 minutes prior</strong> to scheduled appointment times to prepare for their consultation.</li>
+                <li>If you arrive more than 15 minutes past your scheduled slot, we may need to shorten the session or reschedule to accommodate subsequent clients.</li>
+            </ul>
+
+            <h2>3. Cancellation & Rescheduling Policy</h2>
+            <ul>
+                <li>We understand schedules change. If you need to cancel or reschedule, please notify us at least <strong>4 hours in advance</strong> via phone or WhatsApp.</li>
+                <li>Cancellations can be made by contacting our support team with your Booking Reference ID.</li>
+            </ul>
+
+            <h2>4. Pricing & Payments</h2>
+            <ul>
+                <li>All service prices displayed on our website are inclusive of standard consultation fees and in Indian Rupees (₹).</li>
+                <li>Payment is collected in-studio upon service completion via Cash, UPI, Debit Cards, or Credit Cards.</li>
+                <li>Customized bridal or group packages may require an advance booking deposit.</li>
+            </ul>
+
+            <h2>5. Studio Etiquette & Health</h2>
+            <ul>
+                <li>Please notify our stylists in advance if you have sensitive skin, allergies, or any medical conditions relevant to cosmetic treatments.</li>
+                <li>We maintain a calm and tranquil sanctuary for all guests; we kindly ask that mobile devices be placed on silent mode during services.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}

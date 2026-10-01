@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed — {{ appointment.booking_id }}{% endblock %}
+
+{% block content %}
+<section class="section confirmation-page">
+    <div class="container">
+        <div class="confirmation-card">
+            <div class="confirmation-icon">
+                ✨
+            </div>
+
+            <span class="status-badge status-{{ appointment.status }}" style="margin-bottom: var(--space-md);">
+                {{ appointment.get_status_display }}
+            </span>
+
+            <h1 style="font-size: 2rem; margin-bottom: var(--space-xs); color: var(--color-accent-dark);">
+                Appointment Confirmed!
+            </h1>
+            <p style="color: var(--color-text-light); margin-bottom: var(--space-lg);">
+                Thank you, <strong>{{ appointment.customer.full_name }}</strong>! Your appointment has been successfully scheduled.
+            </p>
+
+            <div style="margin-bottom: var(--space-xl);">
+                <div style="font-size: 0.85rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em;">
+                    Your Unique Booking Reference
+                </div>
+                <div class="booking-id-display" id="bookingReference">
+                    {{ appointment.booking_id }}
+                </div>
+                <div style="font-size: 0.85rem; color: var(--color-text-light);">
+                    Save this reference to check your appointment status anytime.
+                </div>
+            </div>
+
+            <div class="confirmation-details">
+                <h3 style="font-size: 1.1rem; margin-bottom: var(--space-md); color: var(--color-accent-dark); border-bottom: 1px solid var(--color-border-light); padding-bottom: var(--space-xs);">
+                    Booking Summary
+                </h3>
+
+                <div class="detail-row">
+                    <span class="detail-label">Service</span>
+                    <span class="detail-value"><strong>{{ appointment.service.name }}</strong> ({{ appointment.service.category.name }})</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Price</span>
+                    <span class="detail-value" style="color: var(--color-primary-dark); font-weight: 700;">{{ appointment.service.price_display }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duration</span>
+                    <span class="detail-value">{{ appointment.service.duration_display }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date</span>
+                    <span class="detail-value">📅 {{ appointment.appointment_date|date:"l, F j, Y" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time Slot</span>
+                    <span class="detail-value">🕐 {{ appointment.time_display }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Customer Name</span>
+                    <span class="detail-value">{{ appointment.customer.full_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Contact Phone</span>
+                    <span class="detail-value">{{ appointment.customer.phone }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{ appointment.customer.email }}</span>
+                </div>
+                {% if appointment.message %}
+                <div class="detail-row">
+                    <span class="detail-label">Special Notes</span>
+                    <span class="detail-value">{{ appointment.message }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div style="background: var(--color-primary-50); border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-xl); text-align: left; font-size: 0.88rem;">
+                📍 <strong>Location:</strong> {{ business_address }}<br>
+                📞 <strong>Need help or changes?</strong> Call {{ business_phone }} or message us on WhatsApp.
+            </div>
+
+            <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" id="print-confirmation">
+                    🖨️ Print Confirmation
+                </button>
+                <a href="{% url 'appointments:check_booking' %}" class="btn btn-secondary">
+                    🔍 Lookup Booking
+                </a>
+                <a href="https://wa.me/{{ whatsapp_number|cut:'+' }}?text=Hi%20GlowNest!%20My%20booking%20reference%20is%20{{ appointment.booking_id }}." 
+                   target="_blank" rel="noopener" class="btn btn-secondary" style="color: #25d366; border-color: #25d366;">
+                    💬 WhatsApp Salon
+                </a>
+                <a href="{% url 'appointments:home' %}" class="btn btn-primary">
+                    Return to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

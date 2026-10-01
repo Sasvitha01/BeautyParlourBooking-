@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-inner">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    Now Accepting Online Bookings
+                </div>
+                <h1>
+                    Experience the Art of
+                    <span class="highlight">Timeless Beauty</span>
+                </h1>
+                <p class="hero-description">
+                    Welcome to GlowNest Beauty Studio — where expert stylists and premium products come together to
+                    reveal your most radiant self. Book your transformation today.
+                </p>
+                <div class="hero-buttons">
+                    <a href="{% url 'appointments:book_appointment' %}" class="btn btn-primary btn-lg">Book an
+                        Appointment</a>
+                    <a href="{% url 'services:service_list' %}" class="btn btn-secondary btn-lg">Explore Services</a>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <span class="hero-stat-number">5000+</span>
+                        <span class="hero-stat-label">Happy Clients</span>
+                    </div>
+                    <div>
+                        <span class="hero-stat-number">15+</span>
+                        <span class="hero-stat-label">Expert Stylists</span>
+                    </div>
+                    <div>
+                        <span class="hero-stat-number">8+</span>
+                        <span class="hero-stat-label">Years Experience</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-image-container">
+                    <div class="hero-image-placeholder">
+                        <span class="hero-emoji">💆‍♀️</span>
+                        <span class="hero-image-text">Beauty & Wellness</span>
+                    </div>
+                    <div class="hero-float-card card-1">
+                        <div class="float-card-label">Rating</div>
+                        <div class="float-card-value">⭐ 4.9/5</div>
+                    </div>
+                    <div class="hero-float-card card-2">
+                        <div class="float-card-label">Bookings</div>
+                        <div class="float-card-value">📅 Open Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Services -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>Our Featured Services</h2>
+            <p class="section-subtitle">Discover our most popular beauty treatments, crafted to make you look and feel
+                extraordinary</p>
+        </div>
+        <div class="service-grid">
+            {% for service in featured_services %}
+            <a href="{{ service.get_absolute_url }}" class="card" style="text-decoration:none; color:inherit;">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" alt="{{ service.name }}" class="card-image">
+                {% else %}
+                <div class="card-image-placeholder">
+                    {{ service.category.icon|default:"✨" }}
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="card-category">{{ service.category.name }}</div>
+                    <h3 class="card-title">{{ service.name }}</h3>
+                    <p class="card-description">{{
+                        service.short_description|default:service.description|truncatewords:20 }}</p>
+                    <div class="card-meta">
+                        <div class="card-meta-item">
+                            <span class="meta-icon">⏱️</span>
+                            {{ service.duration_display }}
+                        </div>
+                        <div class="card-price">{{ service.price_display }}</div>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-icon">🌸</div>
+                <h3>Services Coming Soon</h3>
+                <p>Our services are being updated. Please check back shortly.</p>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center" style="margin-top: var(--space-2xl);">
+            <a href="{% url 'services:service_list' %}" class="btn btn-secondary">View All Services →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section features-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>Why Choose GlowNest?</h2>
+            <p class="section-subtitle">We go beyond beauty — delivering an experience that nurtures your confidence</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3>Premium Products</h3>
+                <p>We use only top-tier, salon-grade products from trusted international brands for lasting results.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👩‍🎨</div>
+                <h3>Expert Stylists</h3>
+                <p>Our certified beauty professionals bring years of experience and continuous training to every
+                    session.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌿</div>
+                <h3>Relaxing Ambiance</h3>
+                <p>Step into a serene sanctuary designed to help you unwind and enjoy your beauty experience.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Transparent Pricing</h3>
+                <p>No hidden charges. Every service is clearly priced, so you always know what to expect.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🕐</div>
+                <h3>Easy Online Booking</h3>
+                <p>Book your appointment in under a minute with our simple online scheduling system.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Hygiene First</h3>
+                <p>Stringent sanitization protocols and single-use tools ensure your safety at every visit.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>What Our Clients Say</h2>
+            <p class="section-subtitle">Real experiences from real clients who trust GlowNest with their beauty</p>
+        </div>
+        <div class="testimonials-grid">
+            {% for testimonial in testimonials %}
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= testimonial.rating %}★{% else %}☆{% endif %} {% endfor %} </div>
+                        <p class="testimonial-text">"{{ testimonial.text }}"</p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">{{ testimonial.initials }}</div>
+                            <div class="testimonial-info">
+                                <h4>{{ testimonial.name }}</h4>
+                                <p>{{ testimonial.service }}</p>
+                            </div>
+                        </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready for Your Glow-Up?</h2>
+            <p>Book your appointment today and let our experts create the perfect look for you. New clients get a
+                special welcome discount!</p>
+            <div class="cta-buttons">
+                <a href="{% url 'appointments:book_appointment' %}" class="btn btn-primary btn-lg">Book Your
+                    Appointment</a>
+                <a href="{% url 'appointments:contact' %}" class="btn btn-secondary btn-lg">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Opening Hours & Location -->
+<section class="section info-section">
+    <div class="container">
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🕐 Opening Hours</h3>
+                <div class="hours-table">
+                    <div class="hours-row">
+                        <span class="hours-day">Monday – Friday</span>
+                        <span class="hours-time">{{ opening_hours.weekdays }}</span>
+                    </div>
+                    <div class="hours-row">
+                        <span class="hours-day">Saturday</span>
+                        <span class="hours-time">{{ opening_hours.saturday }}</span>
+                    </div>
+                    <div class="hours-row">
+                        <span class="hours-day">Sunday</span>
+                        <span class="hours-time">{{ opening_hours.sunday }}</span>
+                    </div>
+                    <div class="hours-row">
+                        <span class="hours-day" style="color: var(--color-text-muted); font-style: italic;">Lunch
+                            Break</span>
+                        <span class="hours-time" style="font-style: italic;">1:00 PM – 2:00 PM</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card">
+                <h3>📍 Find Us</h3>
+                <p style="color: var(--color-text-light); margin-bottom: var(--space-lg);">{{ business_address }}</p>
+                <div
+                    style="background: var(--color-bg-alt); border-radius: var(--radius-md); height: 200px; display:flex; align-items:center; justify-content:center; color: var(--color-text-muted); font-size: 0.9rem;">
+                    <div style="text-align:center;">
+                        <div style="font-size:2.5rem; margin-bottom: var(--space-sm);">🗺️</div>
+                        <p style="margin:0;">Koramangala, Bangalore</p>
+                        <a href="https://maps.google.com/?q=Koramangala+Bangalore" target="_blank" rel="noopener"
+                            class="btn btn-sm btn-secondary" style="margin-top: var(--space-md);">Open in Maps</a>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card">
+                <h3>📞 Get in Touch</h3>
+                <div style="margin-bottom: var(--space-lg);">
+                    <p style="color: var(--color-text-light); margin-bottom: var(--space-sm);">
+                        <strong>Phone:</strong> {{ business_phone }}
+                    </p>
+                    <p style="color: var(--color-text-light); margin-bottom: var(--space-sm);">
+                        <strong>Email:</strong> {{ business_email }}
+                    </p>
+                </div>
+                <a href="{% url 'appointments:contact' %}" class="btn btn-primary" style="width:100%;">Send a
+                    Message</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

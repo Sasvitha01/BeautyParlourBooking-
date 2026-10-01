@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Server Error (500){% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div class="container text-center">
+        <div class="error-code">500</div>
+        <h2>Server Error</h2>
+        <p>Something went wrong on our end while processing your request. Please try again or reach out to our front desk directly.</p>
+        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'appointments:home' %}" class="btn btn-primary btn-lg">Return to Home</a>
+            <a href="{% url 'appointments:contact' %}" class="btn btn-secondary btn-lg">Contact Support</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

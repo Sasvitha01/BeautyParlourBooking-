@@ -1,0 +1,147 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Appointment {{ appointment.booking_id }}{% endblock %}
+{% block dashboard_title %}Appointment Details{% endblock %}
+
+{% block dashboard_content %}
+<div style="margin-bottom: var(--space-lg);">
+    <a href="{% url 'dashboard:appointments' %}" class="btn btn-secondary btn-sm">
+        ← Back to All Appointments
+    </a>
+</div>
+
+<div class="appointment-detail-card">
+    <div class="appointment-detail-header">
+        <div>
+            <div style="font-size: 0.8rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em;">
+                Booking Reference
+            </div>
+            <h2 style="font-family: monospace; font-size: 1.5rem; margin: 0; color: var(--color-primary-dark);">
+                {{ appointment.booking_id }}
+            </h2>
+            <div style="font-size: 0.82rem; color: var(--color-text-muted); margin-top: 4px;">
+                Booked on {{ appointment.created_at|date:"F j, Y, g:i A" }}
+            </div>
+        </div>
+
+        <div>
+            <span class="status-badge status-{{ appointment.status }}" style="font-size: 0.95rem; padding: 0.4rem 1rem;">
+                {{ appointment.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="appointment-detail-body">
+        <!-- Client Details -->
+        <div class="detail-section">
+            <h3>👤 Client Information</h3>
+            <div class="confirmation-details">
+                <div class="detail-row">
+                    <span class="detail-label">Full Name</span>
+                    <span class="detail-value">{{ appointment.customer.full_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone Number</span>
+                    <span class="detail-value">
+                        <a href="tel:{{ appointment.customer.phone }}">{{ appointment.customer.phone }}</a>
+                        &nbsp;
+                        <a href="https://wa.me/{{ appointment.customer.phone|cut:'+' }}?text=Hi%20{{ appointment.customer.full_name|urlencode }}!%20Regarding%20your%20appointment%20{{ appointment.booking_id }}%20at%20GlowNest." 
+                           target="_blank" rel="noopener" style="font-size: 0.85rem; color: #25d366;">
+                            💬 WhatsApp
+                        </a>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email Address</span>
+                    <span class="detail-value">
+                        <a href="mailto:{{ appointment.customer.email }}">{{ appointment.customer.email }}</a>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Client Bookings</span>
+                    <span class="detail-value">{{ appointment.customer.total_appointments }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service & Schedule -->
+        <div class="detail-section">
+            <h3>✨ Service & Session Details</h3>
+            <div class="confirmation-details">
+                <div class="detail-row">
+                    <span class="detail-label">Service</span>
+                    <span class="detail-value"><strong>{{ appointment.service.name }}</strong></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Category</span>
+                    <span class="detail-value">{{ appointment.service.category.name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Price</span>
+                    <span class="detail-value" style="font-weight: 700; color: var(--color-primary-dark);">{{ appointment.service.price_display }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duration</span>
+                    <span class="detail-value">{{ appointment.service.duration_display }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Scheduled Date</span>
+                    <span class="detail-value">📅 {{ appointment.appointment_date|date:"l, F j, Y" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Scheduled Time Slot</span>
+                    <span class="detail-value">🕐 {{ appointment.time_display }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Special Notes -->
+        {% if appointment.message %}
+        <div class="detail-section">
+            <h3>📝 Customer Notes</h3>
+            <div style="background: var(--color-bg-alt); padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.95rem;">
+                {{ appointment.message }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Status Actions -->
+    <div class="appointment-detail-actions">
+        {% if appointment.can_confirm %}
+        <form method="post" action="{% url 'dashboard:appointment_action' appointment.booking_id 'confirm' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">
+                ✅ Confirm Appointment
+            </button>
+        </form>
+        {% endif %}
+
+        {% if appointment.can_complete %}
+        <form method="post" action="{% url 'dashboard:appointment_action' appointment.booking_id 'complete' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary" style="color: var(--color-success); border-color: var(--color-success);">
+                🎉 Mark as Completed
+            </button>
+        </form>
+        {% endif %}
+
+        {% if appointment.can_cancel %}
+        <form method="post" action="{% url 'dashboard:appointment_action' appointment.booking_id 'cancel' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary" style="color: var(--color-danger); border-color: var(--color-danger);" data-confirm="Are you sure you want to cancel this appointment?">
+                ❌ Cancel Appointment
+            </button>
+        </form>
+        {% endif %}
+
+        <form method="post" action="{% url 'dashboard:appointment_action' appointment.booking_id 'delete' %}" style="display:inline; margin-left: auto;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary" style="color: var(--color-danger); border-color: transparent;" data-confirm="PERMANENT DELETION: Are you sure you want to permanently delete appointment {{ appointment.booking_id }}?">
+                🗑️ Delete Record
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

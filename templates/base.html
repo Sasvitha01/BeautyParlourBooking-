@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="GlowNest Beauty Studio — Premium beauty services including hair care, skin care, makeup, bridal packages, spa treatments and more. Book your appointment today.">
+    <meta name="keywords" content="beauty salon, hair salon, spa, makeup, bridal makeup, facial, beauty studio">
+    <meta name="author" content="GlowNest Beauty Studio">
+    <title>{% block title %}{{ page_title|default:"" }}{% endblock %} | {{ business_name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <a href="{% url 'appointments:home' %}" class="logo">
+                <span class="logo-icon">✨</span>
+                <span class="logo-text">Glow<span>Nest</span></span>
+            </a>
+            <nav>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="{% url 'appointments:home' %}">Home</a></li>
+                    <li><a href="{% url 'services:service_list' %}">Services</a></li>
+                    <li><a href="{% url 'appointments:about' %}">About</a></li>
+                    <li><a href="{% url 'appointments:contact' %}">Contact</a></li>
+                    <li><a href="{% url 'appointments:check_booking' %}">Check Booking</a></li>
+                    <li class="nav-cta">
+                        <a href="{% url 'appointments:book_appointment' %}" class="btn btn-primary btn-sm">Book Now</a>
+                    </li>
+                </ul>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="main-content">
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="message message-{{ message.tags }}">
+                {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning'
+                %}⚠️{% else %}ℹ️{% endif %}
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <span class="logo-icon">✨</span>
+                        <span class="logo-text">Glow<span>Nest</span></span>
+                    </div>
+                    <p>Where beauty meets confidence. We provide premium beauty services with a personal touch, helping
+                        you look and feel your absolute best.</p>
+                    <div class="footer-social">
+                        <a href="{{ social_links.instagram }}" aria-label="Instagram">📷</a>
+                        <a href="{{ social_links.facebook }}" aria-label="Facebook">📘</a>
+                        <a href="{{ social_links.twitter }}" aria-label="Twitter">🐦</a>
+                        <a href="{{ social_links.youtube }}" aria-label="YouTube">▶️</a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'appointments:home' %}">Home</a></li>
+                        <li><a href="{% url 'services:service_list' %}">Our Services</a></li>
+                        <li><a href="{% url 'appointments:about' %}">About Us</a></li>
+                        <li><a href="{% url 'appointments:book_appointment' %}">Book Appointment</a></li>
+                        <li><a href="{% url 'appointments:check_booking' %}">Check Booking</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'services:service_list' %}?category=hair-care">Hair Care</a></li>
+                        <li><a href="{% url 'services:service_list' %}?category=skin-care">Skin Care</a></li>
+                        <li><a href="{% url 'services:service_list' %}?category=makeup">Makeup</a></li>
+                        <li><a href="{% url 'services:service_list' %}?category=bridal">Bridal</a></li>
+                        <li><a href="{% url 'services:service_list' %}?category=spa-wellness">Spa & Wellness</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact</h4>
+                    <ul class="footer-links">
+                        <li>📞 {{ business_phone }}</li>
+                        <li>✉️ {{ business_email }}</li>
+                        <li>📍 {{ business_city }}</li>
+                        <li><a href="{% url 'appointments:contact' %}">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 {{ business_name }}. All rights reserved.</p>
+                <p>
+                    <a href="{% url 'appointments:privacy' %}" style="color: rgba(255,255,255,0.5);">Privacy Policy</a>
+                    &middot;
+                    <a href="{% url 'appointments:terms' %}" style="color: rgba(255,255,255,0.5);">Terms</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp CTA -->
+    <a href="https://wa.me/{{ whatsapp_number|cut:'+' }}?text=Hi%20GlowNest!%20I'd%20like%20to%20book%20an%20appointment."
+        class="whatsapp-btn" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"
+        title="Chat with us on WhatsApp">
+        💬
+    </a>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

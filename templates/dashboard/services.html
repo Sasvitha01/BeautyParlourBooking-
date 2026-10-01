@@ -1,0 +1,160 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Manage Services{% endblock %}
+{% block dashboard_title %}Manage Services & Catalog{% endblock %}
+
+{% block dashboard_content %}
+<!-- Actions Bar -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
+    <p style="color: var(--color-text-light); margin: 0;">
+        Manage service offerings, pricing, durations, and categories for GlowNest.
+    </p>
+    <div style="display: flex; gap: var(--space-sm);">
+        <a href="{% url 'dashboard:category_add' %}" class="btn btn-secondary">
+            + Add Category
+        </a>
+        <a href="{% url 'dashboard:service_add' %}" class="btn btn-primary">
+            + Add New Service
+        </a>
+    </div>
+</div>
+
+<!-- Service Categories Quick List -->
+<div class="dashboard-card" style="margin-bottom: var(--space-xl);">
+    <div class="dashboard-card-header">
+        <h2>Service Categories ({{ categories|length }})</h2>
+        <a href="{% url 'dashboard:category_add' %}" class="btn btn-secondary btn-sm">+ New Category</a>
+    </div>
+    <div class="dashboard-card-body" style="padding: 0;">
+        {% if categories %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Icon</th>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Services Count</th>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td style="font-size: 1.5rem;">{{ cat.icon|default:"📁" }}</td>
+                        <td><strong>{{ cat.name }}</strong></td>
+                        <td><code>{{ cat.slug }}</code></td>
+                        <td>{{ cat.active_services_count }} active</td>
+                        <td>{{ cat.display_order }}</td>
+                        <td>
+                            {% if cat.is_active %}
+                            <span class="status-badge status-completed">Active</span>
+                            {% else %}
+                            <span class="status-badge status-cancelled">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'dashboard:category_edit' cat.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📁</div>
+            <h3>No Categories Created Yet</h3>
+            <p>Create service categories first before adding services.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- All Services Table -->
+<div class="dashboard-card">
+    <div class="dashboard-card-header">
+        <h2>All Services ({{ services|length }})</h2>
+        <a href="{% url 'dashboard:service_add' %}" class="btn btn-primary btn-sm">+ Add Service</a>
+    </div>
+    <div class="dashboard-card-body" style="padding: 0;">
+        {% if services %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Duration</th>
+                        <th>Order</th>
+                        <th>Featured</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for svc in services %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">{{ svc.name }}</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">
+                                {{ svc.short_description|default:svc.description|truncatewords:8 }}
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.85rem; color: var(--color-primary);">
+                                {{ svc.category.name }}
+                            </span>
+                        </td>
+                        <td><strong>{{ svc.price_display }}</strong></td>
+                        <td>{{ svc.duration_display }}</td>
+                        <td>{{ svc.display_order }}</td>
+                        <td>
+                            {% if svc.is_featured %}
+                            <span style="color: var(--color-warning); font-size: 0.85rem; font-weight: 600;">⭐ Featured</span>
+                            {% else %}
+                            <span style="color: var(--color-text-muted); font-size: 0.85rem;">Standard</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if svc.is_active %}
+                            <span class="status-badge status-completed">Active</span>
+                            {% else %}
+                            <span class="status-badge status-cancelled">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="table-actions" style="justify-content: flex-end;">
+                                <a href="{% url 'dashboard:service_edit' svc.pk %}" class="btn btn-secondary btn-sm" title="Edit service">
+                                    Edit
+                                </a>
+                                <form method="post" action="{% url 'dashboard:service_delete' svc.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-danger);" data-confirm="Are you sure you want to deactivate or delete '{{ svc.name }}'?" title="Delete or Deactivate">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">✨</div>
+            <h3>No Services Listed</h3>
+            <p>Start by creating beauty services so clients can view and book appointments online.</p>
+            <div style="margin-top: var(--space-md);">
+                <a href="{% url 'dashboard:service_add' %}" class="btn btn-primary btn-sm">+ Add First Service</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

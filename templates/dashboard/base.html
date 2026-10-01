@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ page_title|default:"Admin Dashboard" }}{% endblock %} | GlowNest Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="{% url 'dashboard:index' %}" class="logo" style="text-decoration: none;">
+                    <span class="logo-icon">✨</span>
+                    <span class="logo-text">Glow<span>Nest</span> <small style="font-size: 0.65em; opacity: 0.7; font-weight: normal;">Admin</small></span>
+                </a>
+            </div>
+
+            <div class="sidebar-label">Management</div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="{% url 'dashboard:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                        <span class="nav-icon">📊</span>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard:appointments' %}" class="{% if 'appointment' in request.resolver_match.url_name %}active{% endif %}">
+                        <span class="nav-icon">📅</span>
+                        <span>Appointments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard:services' %}" class="{% if 'service' in request.resolver_match.url_name or 'category' in request.resolver_match.url_name %}active{% endif %}">
+                        <span class="nav-icon">✨</span>
+                        <span>Services & Catalog</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard:customers' %}" class="{% if request.resolver_match.url_name == 'customers' %}active{% endif %}">
+                        <span class="nav-icon">👥</span>
+                        <span>Customer Directory</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-label">Shortcuts & Tools</div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/django-admin/" target="_blank">
+                        <span class="nav-icon">⚙️</span>
+                        <span>Django Admin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'appointments:home' %}" target="_blank">
+                        <span class="nav-icon">🌐</span>
+                        <span>View Public Website</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'dashboard:logout' %}" data-confirm="Are you sure you want to log out?">
+                    <span>🚪</span>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <!-- Topbar -->
+            <div class="dashboard-topbar">
+                <div style="display: flex; align-items: center; gap: var(--space-md);">
+                    <button class="sidebar-toggle" aria-label="Toggle navigation">☰</button>
+                    <h1>{% block dashboard_title %}{{ page_title|default:"Dashboard" }}{% endblock %}</h1>
+                </div>
+
+                <div class="dashboard-topbar-right">
+                    <div style="text-align: right; display: none; sm:block;">
+                        <div style="font-weight: 600; font-size: 0.9rem;">{{ request.user.get_full_name|default:request.user.username }}</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">Salon Administrator</div>
+                    </div>
+                    <div class="admin-avatar">
+                        {{ request.user.username|slice:":2"|upper }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+            <ul class="messages" style="padding: 0; margin-bottom: var(--space-lg);">
+                {% for message in messages %}
+                <li class="message message-{{ message.tags }}">
+                    {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+                    {{ message }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <!-- Content Block -->
+            {% block dashboard_content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{% static 'js/dashboard.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

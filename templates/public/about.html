@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'appointments:home' %}">Home</a>
+            <span class="separator">/</span>
+            <span>About Us</span>
+        </div>
+        <h1>Welcome to GlowNest</h1>
+        <p>A sanctuary of self-care and artistry where modern techniques meet bespoke hospitality.</p>
+    </div>
+</section>
+
+<section class="section about-content">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-image-placeholder">
+                <span>💆‍♀️✨</span>
+            </div>
+            <div class="about-text">
+                <div class="section-accent"></div>
+                <h2>Our Story & Philosophy</h2>
+                <p>Founded in the heart of Bangalore, GlowNest Beauty Studio was established with a singular vision: to craft a sanctuary where every individual can experience the pinnacle of beauty, wellness, and rejuvenation.</p>
+                <p>We believe that beauty is deeply personal. Our philosophy centers on enhancing your innate elegance with tailored consultations, high-grade organic and dermatologist-tested products, and state-of-the-art styling techniques.</p>
+                <p>Whether you're visiting for an everyday refresh, an indulgent bridal experience, or an immersive hair ritual, our experienced team ensures an atmosphere of gentle calm and meticulous care.</p>
+            </div>
+        </div>
+
+        <!-- Salon Values -->
+        <div style="margin-top: var(--space-4xl);">
+            <div class="section-header">
+                <div class="section-accent"></div>
+                <h2>Our Core Values</h2>
+                <p class="section-subtitle">What drives our passion for perfection in every service we deliver</p>
+            </div>
+
+            <div class="about-values">
+                <div class="about-value-item">
+                    <div class="about-value-icon">💎</div>
+                    <div>
+                        <h4>Uncompromising Quality</h4>
+                        <p>We source salon-exclusive formulations from world-renowned brands, ensuring lasting beauty and wellness.</p>
+                    </div>
+                </div>
+
+                <div class="about-value-item">
+                    <div class="about-value-icon">🛡️</div>
+                    <div>
+                        <h4>Highest Hygiene Standards</h4>
+                        <p>Hospital-grade sterilization for metallic tools, single-use disposables, and pristine treatment stations.</p>
+                    </div>
+                </div>
+
+                <div class="about-value-item">
+                    <div class="about-value-icon">👩‍🎨</div>
+                    <div>
+                        <h4>Master Stylists</h4>
+                        <p>Our team undergoes ongoing professional masterclasses in contemporary styling, skincare, and bridal art.</p>
+                    </div>
+                </div>
+
+                <div class="about-value-item">
+                    <div class="about-value-icon">🕊️</div>
+                    <div>
+                        <h4>Serene Ambiance</h4>
+                        <p>Designed with calming acoustic balance, warm ambient lighting, and gentle aromatherapy for total peace.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team & Experience Callout -->
+<section class="section features-section">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3>Personalized Consultations</h3>
+                <p>Every session begins with a personalized consultation to understand your skin, hair, and style goals.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌿</div>
+                <h3>Eco-Conscious Care</h3>
+                <p>We favor cruelty-free, sustainable, and botanical-based products that nourish both you and the earth.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👑</div>
+                <h3>VIP Bridal Suites</h3>
+                <p>Exclusive private bridal suites dedicated to making your wedding preparation relaxing and unforgettable.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Experience GlowNest Firsthand</h2>
+            <p>Ready to look and feel your absolute best? Reserve your appointment with our master stylists today.</p>
+            <div class="cta-buttons">
+                <a href="{% url 'appointments:book_appointment' %}" class="btn btn-primary btn-lg">Book an Appointment</a>
+                <a href="{% url 'services:service_list' %}" class="btn btn-secondary btn-lg">Browse Services</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'appointments:home' %}">Home</a>
+            <span class="separator">/</span>
+            <span>Contact</span>
+        </div>
+        <h1>Get in Touch with GlowNest</h1>
+        <p>We'd love to hear from you. Have inquiries about bridal packages, corporate bookings, or special treatments? Let us know!</p>
+    </div>
+</section>
+
+<section class="section contact-content">
+    <div class="container">
+        <div class="contact-grid">
+            <!-- Left Info Card -->
+            <div class="contact-info-card">
+                <h2 style="font-size: 1.5rem; margin-bottom: var(--space-xl); color: var(--color-accent-dark);">Studio Information</h2>
+
+                <div class="contact-item">
+                    <div class="contact-item-icon">📍</div>
+                    <div>
+                        <h4>Studio Address</h4>
+                        <p>{{ business_address }}</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-item-icon">📞</div>
+                    <div>
+                        <h4>Phone Number</h4>
+                        <p><a href="tel:{{ business_phone }}" style="color: inherit;">{{ business_phone }}</a></p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-item-icon">✉️</div>
+                    <div>
+                        <h4>Email Address</h4>
+                        <p><a href="mailto:{{ business_email }}" style="color: inherit;">{{ business_email }}</a></p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-item-icon">🕐</div>
+                    <div>
+                        <h4>Opening Hours</h4>
+                        <p>Mon – Fri: {{ opening_hours.weekdays }}<br>
+                           Saturday: {{ opening_hours.saturday }}<br>
+                           Sunday: {{ opening_hours.sunday }}</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--color-border);">
+                    <h4>Chat Directly with Stylist</h4>
+                    <p style="font-size: 0.88rem; color: var(--color-text-light); margin-bottom: var(--space-md);">
+                        For fast responses during working hours, message our WhatsApp support desk.
+                    </p>
+                    <a href="https://wa.me/{{ whatsapp_number|cut:'+' }}?text=Hi%20GlowNest!%20I'd%20like%20to%20inquire%20about%20your%20services." 
+                       target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="background: #25d366; border-color: #25d366;">
+                        💬 Chat on WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Contact Form Card -->
+            <div class="contact-form-card">
+                <h2 style="font-size: 1.5rem; margin-bottom: var(--space-lg); color: var(--color-accent-dark);">Send Us a Message</h2>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_name">Your Name *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="form-error">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_email">Email Address *</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="form-error">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_subject">Subject *</label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                        <div class="form-error">{{ form.subject.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_message">Message *</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                        <div class="form-error">{{ form.message.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-md);">
+                        ✉️ Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

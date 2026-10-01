@@ -1,0 +1,157 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Manage Appointments{% endblock %}
+{% block dashboard_title %}Manage Appointments{% endblock %}
+
+{% block dashboard_content %}
+<!-- Search & Filters Bar -->
+<div class="dashboard-card" style="margin-bottom: var(--space-xl);">
+    <div class="dashboard-card-body">
+        <form method="get" class="filters-bar" style="margin: 0;">
+            <div class="filter-group" style="flex: 2; min-width: 200px;">
+                <label for="filter-search">Search</label>
+                <input type="text" id="filter-search" name="search" value="{{ search }}" placeholder="Ref ID, Client name, phone, email...">
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-status">Status</label>
+                <select id="filter-status" name="status">
+                    <option value="">All Statuses</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-date">Date</label>
+                <input type="date" id="filter-date" name="date" value="{{ date_filter }}">
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-service">Service</label>
+                <select id="filter-service" name="service">
+                    <option value="">All Services</option>
+                    {% for svc in services %}
+                    <option value="{{ svc.id }}" {% if service_filter == svc.id|stringformat:"s" %}selected{% endif %}>
+                        {{ svc.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: var(--space-xs); align-items: flex-end;">
+                <button type="submit" class="btn btn-primary btn-sm" style="height: 38px;">Apply</button>
+                <a href="{% url 'dashboard:appointments' %}" class="btn btn-secondary btn-sm" style="height: 38px;">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Appointments Table Card -->
+<div class="dashboard-card">
+    <div class="dashboard-card-header">
+        <h2>
+            Appointments 
+            <span style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: normal;">
+                ({{ appointments|length }} found)
+            </span>
+        </h2>
+    </div>
+
+    <div class="dashboard-card-body" style="padding: 0;">
+        {% if appointments %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Client Details</th>
+                        <th>Service</th>
+                        <th>Date & Time</th>
+                        <th>Fee</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'dashboard:appointment_detail' appt.booking_id %}" style="font-family: monospace; font-weight: 700;">
+                                {{ appt.booking_id }}
+                            </a>
+                        </td>
+                        <td>
+                            <strong>{{ appt.customer.full_name }}</strong>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">
+                                📞 {{ appt.customer.phone }}
+                            </div>
+                        </td>
+                        <td>
+                            <div>{{ appt.service.name }}</div>
+                            <div style="font-size: 0.78rem; color: var(--color-primary);">{{ appt.service.category.name }}</div>
+                        </td>
+                        <td>
+                            <strong>{{ appt.appointment_date|date:"d M Y" }}</strong>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">{{ appt.time_display }}</div>
+                        </td>
+                        <td>
+                            <strong>{{ appt.service.price_display }}</strong>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ appt.status }}">
+                                {{ appt.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="table-actions" style="justify-content: flex-end;">
+                                <a href="{% url 'dashboard:appointment_detail' appt.booking_id %}" class="btn btn-secondary btn-sm" title="View details">
+                                    View
+                                </a>
+                                {% if appt.can_confirm %}
+                                <form method="post" action="{% url 'dashboard:appointment_action' appt.booking_id 'confirm' %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm" title="Confirm Booking">
+                                        Confirm
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% if appt.can_complete %}
+                                <form method="post" action="{% url 'dashboard:appointment_action' appt.booking_id 'complete' %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-success); border-color: var(--color-success);" title="Mark Complete">
+                                        Complete
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% if appt.can_cancel %}
+                                <form method="post" action="{% url 'dashboard:appointment_action' appt.booking_id 'cancel' %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-danger);" data-confirm="Cancel this appointment?" title="Cancel Booking">
+                                        Cancel
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <h3>No Appointments Matched Your Criteria</h3>
+            <p>Try clearing filters or adjusting your search term.</p>
+            <div style="margin-top: var(--space-md);">
+                <a href="{% url 'dashboard:appointments' %}" class="btn btn-secondary btn-sm">Clear All Filters</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

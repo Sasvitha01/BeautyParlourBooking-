@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book an Appointment{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'appointments:home' %}">Home</a>
+            <span class="separator">/</span>
+            <span>Book Appointment</span>
+        </div>
+        <h1>Schedule Your Beauty Session</h1>
+        <p>Choose your desired service, date, and time slot. We'll reserve your personal session with our beauty experts.</p>
+    </div>
+</section>
+
+<section class="section booking-page">
+    <div class="container">
+        <div class="booking-container">
+            <div class="booking-form-card">
+                <form method="post" id="bookingForm" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="message message-error" style="margin-bottom: var(--space-lg);">
+                        ❌ {{ form.non_field_errors.0 }}
+                    </div>
+                    {% endif %}
+
+                    <h3 style="font-size: 1.25rem; margin-bottom: var(--space-lg); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border-light);">
+                        👤 Personal Information
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_full_name">Full Name *</label>
+                        {{ form.full_name }}
+                        {% if form.full_name.errors %}
+                        <div class="form-error">{{ form.full_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="id_phone">Phone Number *</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="form-error">{{ form.phone.errors.0 }}</div>
+                            {% else %}
+                            <div class="form-help">Enter 10-14 digits (e.g. +91 98765 43210)</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="id_email">Email Address *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="form-error">{{ form.email.errors.0 }}</div>
+                            {% else %}
+                            <div class="form-help">We'll send booking details here</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1.25rem; margin: var(--space-xl) 0 var(--space-lg); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border-light);">
+                        ✨ Service & Schedule
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_service">Select Service *</label>
+                        {{ form.service }}
+                        {% if form.service.errors %}
+                        <div class="form-error">{{ form.service.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="id_appointment_date">Appointment Date *</label>
+                            {{ form.appointment_date }}
+                            {% if form.appointment_date.errors %}
+                            <div class="form-error">{{ form.appointment_date.errors.0 }}</div>
+                            {% else %}
+                            <div class="form-help">Select a date (today or future up to 90 days)</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="id_appointment_time">Time Slot *</label>
+                            {{ form.appointment_time }}
+                            {% if form.appointment_time.errors %}
+                            <div class="form-error">{{ form.appointment_time.errors.0 }}</div>
+                            {% else %}
+                            <div class="form-help" id="slot-help">Slots update automatically on date selection</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_message">Special Requests or Notes (Optional)</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                        <div class="form-error">{{ form.message.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div style="background: var(--color-primary-50); border: 1px solid var(--color-primary-200); border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-xl); font-size: 0.88rem; color: var(--color-text);">
+                        ℹ️ <strong>Booking Policy:</strong> Please arrive 10 minutes prior to your scheduled time. You can view or check your booking anytime with your booking reference.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                        ✨ Confirm & Book Appointment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

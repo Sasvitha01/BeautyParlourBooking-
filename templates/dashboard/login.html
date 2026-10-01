@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | GlowNest Beauty Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body class="admin-login-page">
+    <div class="login-card">
+        <div class="logo">
+            <span class="logo-icon" style="font-size: 2rem;">✨</span>
+            <div class="logo-text">Glow<span>Nest</span></div>
+        </div>
+        <div class="login-subtitle">Administrator Portal Access</div>
+
+        {% if messages %}
+        <ul class="messages" style="padding: 0; margin-bottom: var(--space-md); list-style: none;">
+            {% for message in messages %}
+            <li class="message message-{{ message.tags }}" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" name="username" id="username" class="form-input" placeholder="Enter admin username" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" name="password" id="password" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                🔒 Sign In to Dashboard
+            </button>
+        </form>
+
+        <a href="{% url 'appointments:home' %}" class="login-back">
+            ← Return to GlowNest Public Website
+        </a>
+    </div>
+</body>
+</html>
