@@ -152,11 +152,17 @@ def check_booking(request):
                     phone_filter |= Q(customer__phone__endswith=clean_digits[-10:])
             try:
                 appointment = Appointment.objects.select_related(
-                    'customer', 'service'
+                    'customer', 'service', 'service__category'
                 ).get(
                     Q(booking_id=cd['booking_id'].strip().upper()) & phone_filter
                 )
             except Appointment.DoesNotExist:
+                not_found = True
+            except Appointment.MultipleObjectsReturned:
+                # Defensive: booking_id is unique, but guard against any DB anomaly
+                not_found = True
+            except Exception:
+                # Catch any unexpected DB/query error so the page never shows a 500
                 not_found = True
     else:
         form = BookingLookupForm()
