@@ -1,18 +1,32 @@
-{% extends 'base.html' %}
 {% load static %}
-
-{% block title %}Server Error (500){% endblock %}
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error | GlowNest Beauty Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
 <section class="error-page">
     <div class="container text-center">
         <div class="error-code">500</div>
-        <h2>Server Error</h2>
-        <p>Something went wrong on our end while processing your request. Please try again or reach out to our front desk directly.</p>
-        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
-            <a href="{% url 'appointments:home' %}" class="btn btn-primary btn-lg">Return to Home</a>
-            <a href="{% url 'appointments:contact' %}" class="btn btn-secondary btn-lg">Contact Support</a>
+        <h2>Something Went Wrong</h2>
+        <p>We apologize for the inconvenience. Our team has been notified and is working to fix the issue.</p>
+        <p style="font-size: 0.95rem; color: var(--color-text-muted);">Please try again in a few minutes.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+            <a href="/" class="btn btn-primary btn-lg">Return to Home</a>
+            <a href="/contact/" class="btn btn-secondary btn-lg">Contact Us</a>
+        </div>
+        <div style="margin-top: 3rem; padding: 1.5rem; background: #f8f4f2; border-radius: 16px; display: inline-block;">
+            <p style="font-size: 0.9rem; color: #7a6e72; margin: 0;">
+                Need immediate help? Call us at <strong>+91 98765 43210</strong>
+            </p>
         </div>
     </div>
 </section>
-{% endblock %}
+</body>
+</html>

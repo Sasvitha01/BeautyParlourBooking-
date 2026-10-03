@@ -175,18 +175,36 @@ def available_slots(request):
     if not date_str:
         return JsonResponse({'error': 'Date is required'}, status=400)
 
+    from django.utils import timezone
+    from datetime import datetime
+    try:
+        query_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+
+    now = timezone.localtime(timezone.now())
+    today = now.date()
+
+    if query_date < today:
+        return JsonResponse({'slots': [], 'booked_count': 0, 'error': 'Past dates cannot be booked.'})
+
+    current_time_str = now.strftime('%H:%M')
+
     # Get booked slots for that date (only active bookings)
-    booked = Appointment.objects.filter(
-        appointment_date=date_str,
+    booked = set(Appointment.objects.filter(
+        appointment_date=query_date,
         status__in=['pending', 'confirmed'],
-    ).values_list('appointment_time', flat=True)
+    ).values_list('appointment_time', flat=True))
 
     all_slots = Appointment.TIME_SLOTS
-    available = [
-        {'value': slot[0], 'label': slot[1]}
-        for slot in all_slots
-        if slot[0] not in booked
-    ]
+    available = []
+    for slot in all_slots:
+        slot_time = slot[0]
+        # Exclude past slots if the requested date is today
+        if query_date == today and slot_time <= current_time_str:
+            continue
+        if slot_time not in booked:
+            available.append({'value': slot[0], 'label': slot[1]})
 
     return JsonResponse({'slots': available, 'booked_count': len(booked)})
 

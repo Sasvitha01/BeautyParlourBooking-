@@ -68,9 +68,18 @@ class AppointmentCreateSerializer(serializers.Serializer):
         return value
 
     def validate(self, data):
-        from datetime import date as dt_date
-        if data['appointment_date'] < dt_date.today():
+        from django.utils import timezone
+        now = timezone.localtime(timezone.now())
+        today = now.date()
+        current_time_str = now.strftime('%H:%M')
+
+        if data['appointment_date'] < today:
             raise serializers.ValidationError({'appointment_date': 'Cannot book in the past.'})
+
+        if data['appointment_date'] == today and data['appointment_time'] <= current_time_str:
+            raise serializers.ValidationError(
+                {'appointment_time': 'This time slot has already passed for today.'}
+            )
 
         existing = Appointment.objects.filter(
             appointment_date=data['appointment_date'],

@@ -99,6 +99,16 @@ class AppointmentBookingForm(forms.Form):
         appt_time = cleaned_data.get('appointment_time')
 
         if appt_date and appt_time:
+            from django.utils import timezone
+            now = timezone.localtime(timezone.now())
+            today = now.date()
+            current_time_str = now.strftime('%H:%M')
+
+            if appt_date == today and appt_time <= current_time_str:
+                raise ValidationError(
+                    'This time slot has already passed for today. Please choose an upcoming time slot.'
+                )
+
             # Check for double booking
             existing = Appointment.objects.filter(
                 appointment_date=appt_date,

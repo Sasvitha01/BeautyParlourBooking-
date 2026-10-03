@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: glownest-beauty-studio
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: gunicorn glownest.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "yourapp.onrender.com"
+      - key: RENDER_EXTERNAL_HOSTNAME
+        fromService:
+          name: glownest-beauty-studio
+          type: web
+          property: host
+      - key: DATABASE_URL
+        fromDatabase:
+          name: glownest-db
+          property: connectionString
+      - key: WHATSAPP_NUMBER
+        value: "+911234567890"
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+
+databases:
+  - name: glownest-db
+    databaseName: glownest
+    user: glownest_user
+    plan: free

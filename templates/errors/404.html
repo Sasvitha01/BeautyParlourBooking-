@@ -8,11 +8,18 @@
     <div class="container text-center">
         <div class="error-code">404</div>
         <h2>Oops! Page Not Found</h2>
-        <p>The page you are looking for might have been moved, renamed, or temporarily unavailable. Let's get you back on track.</p>
-        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+        <p>The page you are looking for might have been moved, renamed, or is temporarily unavailable.</p>
+        <p style="font-size: 0.95rem; color: var(--color-text-muted);">Let's get you back to something beautiful.</p>
+        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap; margin-top: var(--space-xl);">
             <a href="{% url 'appointments:home' %}" class="btn btn-primary btn-lg">Return to Home</a>
             <a href="{% url 'services:service_list' %}" class="btn btn-secondary btn-lg">View Services</a>
             <a href="{% url 'appointments:book_appointment' %}" class="btn btn-secondary btn-lg">Book Appointment</a>
+        </div>
+        <div style="margin-top: var(--space-3xl); padding: var(--space-xl); background: var(--color-bg-alt); border-radius: var(--radius-lg); display: inline-block;">
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); margin: 0;">
+                Need help? Call us at <strong><a href="tel:{{ business_phone }}" style="color: var(--color-primary-dark);">{{ business_phone }}</a></strong>
+                or <a href="{% url 'appointments:contact' %}" style="color: var(--color-primary-dark);">send us a message</a>.
+            </p>
         </div>
     </div>
 </section>

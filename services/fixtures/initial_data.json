@@ -1,0 +1,352 @@
+[
+{
+  "model": "services.servicecategory",
+  "pk": 1,
+  "fields": {
+    "name": "Hair Care",
+    "slug": "hair-care",
+    "description": "From revitalizing hair spas to contemporary styling and keratin therapies.",
+    "icon": "✂️",
+    "display_order": 1,
+    "is_active": true,
+    "created_at": "2026-10-01T15:11:16.132Z",
+    "updated_at": "2026-10-01T15:11:16.132Z"
+  }
+},
+{
+  "model": "services.servicecategory",
+  "pk": 2,
+  "fields": {
+    "name": "Skin Care & Facials",
+    "slug": "skin-care",
+    "description": "Advanced dermatologist-backed facials for radiant, plump, and flawless skin.",
+    "icon": "🧖‍♀️",
+    "display_order": 2,
+    "is_active": true,
+    "created_at": "2026-10-01T15:11:16.175Z",
+    "updated_at": "2026-10-01T15:11:16.175Z"
+  }
+},
+{
+  "model": "services.servicecategory",
+  "pk": 3,
+  "fields": {
+    "name": "Makeup & Styling",
+    "slug": "makeup",
+    "description": "Flawless makeup looks for parties, celebrations, and festive occasions.",
+    "icon": "💄",
+    "display_order": 3,
+    "is_active": true,
+    "created_at": "2026-10-01T15:11:16.215Z",
+    "updated_at": "2026-10-01T15:11:16.215Z"
+  }
+},
+{
+  "model": "services.servicecategory",
+  "pk": 4,
+  "fields": {
+    "name": "Bridal Studio",
+    "slug": "bridal",
+    "description": "Bespoke bridal styling, jewelry setting, draping, and VIP bridal suites.",
+    "icon": "👰‍♀️",
+    "display_order": 4,
+    "is_active": true,
+    "created_at": "2026-10-01T15:11:16.246Z",
+    "updated_at": "2026-10-01T15:11:16.246Z"
+  }
+},
+{
+  "model": "services.servicecategory",
+  "pk": 5,
+  "fields": {
+    "name": "Spa & Wellness",
+    "slug": "spa-wellness",
+    "description": "Holistic massages, aromatherapy, and tranquil relaxation therapies.",
+    "icon": "💆‍♀️",
+    "display_order": 5,
+    "is_active": true,
+    "created_at": "2026-10-01T15:11:16.276Z",
+    "updated_at": "2026-10-01T15:11:16.276Z"
+  }
+},
+{
+  "model": "services.servicecategory",
+  "pk": 6,
+  "fields": {
+    "name": "Nail Bar",
+    "slug": "nail-bar",
+    "description": "Artisan manicures, gel pedicures, extensions, and custom nail art.",
+    "icon": "💅",
+    "display_order": 6,
+    "is_active": true,
+    "created_at": "2026-10-01T15:11:16.305Z",
+    "updated_at": "2026-10-01T15:11:16.305Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 1,
+  "fields": {
+    "category": 1,
+    "name": "Deluxe Hair Spa & Scalp Massage",
+    "slug": "deluxe-hair-spa",
+    "description": "An intensive restorative hair therapy featuring rich argan oil conditioning, restorative scalp massage, and steam therapy to repair damaged cuticles and restore natural luster.",
+    "short_description": "Deep nourishment with essential oils and steam infusion.",
+    "price": "1499.00",
+    "duration_minutes": 60,
+    "image": "services/services/deluxe-hair-spa.jpg",
+    "is_active": true,
+    "is_featured": true,
+    "display_order": 1,
+    "created_at": "2026-10-01T15:11:16.145Z",
+    "updated_at": "2026-10-03T07:11:43.178Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 2,
+  "fields": {
+    "category": 1,
+    "name": "Keratin Smoothing & Silk Therapy",
+    "slug": "keratin-smoothing",
+    "description": "Transform rebellious and frizzy hair into silky, sleek strands that last up to 4 months. Infused with natural keratin proteins and organic botanical extracts.",
+    "short_description": "Frizz-free, silky straight hair with protein seal.",
+    "price": "3999.00",
+    "duration_minutes": 120,
+    "image": "services/services/keratin-smoothing.jpg",
+    "is_active": true,
+    "is_featured": true,
+    "display_order": 2,
+    "created_at": "2026-10-01T15:11:16.155Z",
+    "updated_at": "2026-10-03T07:11:43.198Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 3,
+  "fields": {
+    "category": 1,
+    "name": "Custom Layered Cut & Blowout",
+    "slug": "layered-cut-blowout",
+    "description": "A tailored haircut by senior stylists with specialized texture blending, finished with a voluminous bounce blowout and shine serum.",
+    "short_description": "Precision cut tailored to your face structure.",
+    "price": "799.00",
+    "duration_minutes": 45,
+    "image": "services/services/layered-cut-blowout.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 3,
+    "created_at": "2026-10-01T15:11:16.165Z",
+    "updated_at": "2026-10-03T07:11:43.212Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 4,
+  "fields": {
+    "category": 2,
+    "name": "Glow Radiance 24K Gold Facial",
+    "slug": "glow-radiance-gold-facial",
+    "description": "Experience the pinnacle of cellular renewal with our signature 24K pure gold leaf mask, lymphatic drainage massage, and hyaluronic acid hydration.",
+    "short_description": "Ultra-luxurious revitalizing gold leaf facial.",
+    "price": "1999.00",
+    "duration_minutes": 60,
+    "image": "services/services/glow-radiance-gold-facial.jpg",
+    "is_active": true,
+    "is_featured": true,
+    "display_order": 1,
+    "created_at": "2026-10-01T15:11:16.185Z",
+    "updated_at": "2026-10-03T07:11:43.224Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 5,
+  "fields": {
+    "category": 2,
+    "name": "Hydrating Oxygen Infusion Cleanup",
+    "slug": "oxygen-infusion-cleanup",
+    "description": "Deep cleansing pore extraction followed by hyperbaric oxygen mist delivery of peptide serums to instantly illuminate tired, dehydrated skin.",
+    "short_description": "Immediate moisture boost and deep pore unclogging.",
+    "price": "1299.00",
+    "duration_minutes": 45,
+    "image": "services/services/oxygen-infusion-cleanup.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 2,
+    "created_at": "2026-10-01T15:11:16.196Z",
+    "updated_at": "2026-10-03T07:11:43.236Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 6,
+  "fields": {
+    "category": 2,
+    "name": "Anti-Aging Collagen Rejuvenation",
+    "slug": "anti-aging-collagen",
+    "description": "Combat fine lines and restore firmness with our marine collagen infusion, micro-current lifting, and nourishing peptide ampoules.",
+    "short_description": "Lifting and firming treatment for youthful skin.",
+    "price": "2499.00",
+    "duration_minutes": 75,
+    "image": "services/services/anti-aging-collagen.jpg",
+    "is_active": true,
+    "is_featured": true,
+    "display_order": 3,
+    "created_at": "2026-10-01T15:11:16.205Z",
+    "updated_at": "2026-10-03T07:11:43.249Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 7,
+  "fields": {
+    "category": 3,
+    "name": "Glam Party HD Makeup",
+    "slug": "glam-party-hd-makeup",
+    "description": "Professional high-definition camera-ready makeup tailored for evening galas, cocktail parties, and festive celebrations. Includes lash application.",
+    "short_description": "Camera-ready high definition evening makeover.",
+    "price": "2999.00",
+    "duration_minutes": 60,
+    "image": "services/services/glam-party-hd-makeup.jpg",
+    "is_active": true,
+    "is_featured": true,
+    "display_order": 1,
+    "created_at": "2026-10-01T15:11:16.226Z",
+    "updated_at": "2026-10-03T07:11:43.262Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 8,
+  "fields": {
+    "category": 3,
+    "name": "Soft Glam Daytime Makeover",
+    "slug": "soft-glam-daytime",
+    "description": "A breathable, lightweight dewy makeup look highlighting your natural contours with soft pastel hues and glowing skin finish.",
+    "short_description": "Subtle, fresh radiant makeup for day events.",
+    "price": "1899.00",
+    "duration_minutes": 45,
+    "image": "services/services/soft-glam-daytime.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 2,
+    "created_at": "2026-10-01T15:11:16.236Z",
+    "updated_at": "2026-10-03T07:11:43.273Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 9,
+  "fields": {
+    "category": 4,
+    "name": "Royal Bridal Makeover Package",
+    "slug": "royal-bridal-makeover",
+    "description": "Our flagship bridal package includes HD Airbrush makeup, luxury saree/lehenga draping, hair ornamentation, premium lash extension, and personalized touch-up kit.",
+    "short_description": "Complete bridal couture look with premium airbrushing.",
+    "price": "14999.00",
+    "duration_minutes": 180,
+    "image": "services/services/royal-bridal-makeover.jpg",
+    "is_active": true,
+    "is_featured": true,
+    "display_order": 1,
+    "created_at": "2026-10-01T15:11:16.255Z",
+    "updated_at": "2026-10-03T07:11:43.285Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 10,
+  "fields": {
+    "category": 4,
+    "name": "Pre-Bridal Radiance Ritual",
+    "slug": "pre-bridal-radiance",
+    "description": "A 4-step comprehensive pre-bridal celebration featuring full body scrub, brightening glow wrap, diamond facial, and luxury pedicure.",
+    "short_description": "Head-to-toe full body polishing & glow ritual.",
+    "price": "7499.00",
+    "duration_minutes": 150,
+    "image": "services/services/pre-bridal-radiance.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 2,
+    "created_at": "2026-10-01T15:11:16.266Z",
+    "updated_at": "2026-10-03T07:11:43.296Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 11,
+  "fields": {
+    "category": 5,
+    "name": "Swedish Aromatherapy Body Massage",
+    "slug": "swedish-aromatherapy",
+    "description": "Gentle, flowing strokes combined with aromatic lavender and eucalyptus oils to dissolve tension, soothe aching muscles, and promote restorative rest.",
+    "short_description": "Deep stress relief with organic essential oils.",
+    "price": "2799.00",
+    "duration_minutes": 90,
+    "image": "services/services/swedish-aromatherapy.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 1,
+    "created_at": "2026-10-01T15:11:16.285Z",
+    "updated_at": "2026-10-03T07:11:43.307Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 12,
+  "fields": {
+    "category": 5,
+    "name": "Deep Tissue Herbal Healing",
+    "slug": "deep-tissue-herbal",
+    "description": "Targeted muscle therapy using warm herbal compresses and intense pressure to relieve postural stiffness in neck, shoulders, and lower back.",
+    "short_description": "Focused deep pressure for chronic muscular knots.",
+    "price": "2999.00",
+    "duration_minutes": 90,
+    "image": "services/services/deep-tissue-herbal.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 2,
+    "created_at": "2026-10-01T15:11:16.296Z",
+    "updated_at": "2026-10-03T07:11:43.318Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 13,
+  "fields": {
+    "category": 6,
+    "name": "Luxury Rose Gel Pedicure & Reflexology",
+    "slug": "rose-gel-pedicure",
+    "description": "A relaxing foot bath infused with rose petals and Himalayan salts, callus treatment, foot reflexology massage, and long-lasting gel lacquer.",
+    "short_description": "Petal foot soak, exfoliation & chip-free gel polish.",
+    "price": "1199.00",
+    "duration_minutes": 50,
+    "image": "services/services/rose-gel-pedicure.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 1,
+    "created_at": "2026-10-01T15:11:16.315Z",
+    "updated_at": "2026-10-03T07:11:43.329Z"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 14,
+  "fields": {
+    "category": 6,
+    "name": "Sculpted Gel Extensions & Custom Nail Art",
+    "slug": "sculpted-gel-extensions",
+    "description": "Durable sculpted gel or acrylic extensions crafted to your chosen shape (almond, coffin, square) with two accent nails of intricate bespoke nail art.",
+    "short_description": "Length, shape perfection, and handcrafted art.",
+    "price": "1699.00",
+    "duration_minutes": 60,
+    "image": "services/services/sculpted-gel-extensions.jpg",
+    "is_active": true,
+    "is_featured": false,
+    "display_order": 2,
+    "created_at": "2026-10-01T15:11:16.327Z",
+    "updated_at": "2026-10-03T07:11:43.339Z"
+  }
+}
+]

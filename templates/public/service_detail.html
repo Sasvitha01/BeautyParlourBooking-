@@ -26,11 +26,7 @@
     <div class="container">
         <div class="service-detail-grid">
             <div class="service-detail-image">
-                {% if service.image %}
-                <img src="{{ service.image.url }}" alt="{{ service.name }}">
-                {% else %}
-                <span>{{ service.category.icon|default:"✨" }}</span>
-                {% endif %}
+                <img src="{{ service.image_url }}" alt="{{ service.name }} — professional beauty treatment at GlowNest">
             </div>
             <div class="service-detail-info">
                 <div class="card-category" style="font-size: 0.9rem; margin-bottom: var(--space-xs);">
@@ -95,13 +91,7 @@
                 {% for related in related_services %}
                 <div class="card">
                     <a href="{{ related.get_absolute_url }}" style="text-decoration: none; color: inherit; display: block;">
-                        {% if related.image %}
-                        <img src="{{ related.image.url }}" alt="{{ related.name }}" class="card-image">
-                        {% else %}
-                        <div class="card-image-placeholder">
-                            {{ related.category.icon|default:"✨" }}
-                        </div>
-                        {% endif %}
+                        <img src="{{ related.image_url }}" alt="{{ related.name }}" class="card-image">
                     </a>
                     <div class="card-body">
                         <div class="card-category">{{ related.category.name }}</div>

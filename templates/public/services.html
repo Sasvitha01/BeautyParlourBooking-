@@ -4,7 +4,7 @@
 {% block title %}Our Services{% endblock %}
 
 {% block content %}
-<!-- Page Header -->
+
 <section class="page-header">
     <div class="container">
         <div class="breadcrumb">
@@ -12,92 +12,216 @@
             <span class="separator">/</span>
             <span>Services</span>
         </div>
+
         <h1>Our Beauty & Wellness Services</h1>
-        <p>Explore our wide range of premium salon treatments designed to leave you feeling pampered, refreshed, and radiant.</p>
+
+        <p>
+            Explore our wide range of premium salon treatments designed
+            to leave you feeling pampered, refreshed, and radiant.
+        </p>
     </div>
 </section>
 
-<!-- Services Section -->
+
 <section class="section">
     <div class="container">
-        <!-- Category Filter Pills -->
+
+        <!-- Category Filter -->
         <div class="category-pills">
-            <a href="{% url 'services:service_list' %}" class="category-pill {% if not active_category %}active{% endif %}">
+
+            <a href="{% url 'services:service_list' %}"
+               class="category-pill {% if not active_category %}active{% endif %}">
                 All Services
             </a>
+
             {% for cat in categories %}
-            <a href="{% url 'services:service_list' %}?category={{ cat.slug }}" 
+
+            <a href="{% url 'services:service_list' %}?category={{ cat.slug }}"
                class="category-pill {% if active_category == cat.slug %}active{% endif %}">
-                {% if cat.icon %}{{ cat.icon }} {% endif %}{{ cat.name }}
+
+                {% if cat.icon %}
+                    {{ cat.icon }}
+                {% endif %}
+
+                {{ cat.name }}
+
             </a>
+
             {% endfor %}
+
         </div>
+
 
         <!-- Services Grid -->
         <div class="service-grid">
+
             {% for service in services %}
+
             <div class="card">
-                <a href="{{ service.get_absolute_url }}" style="text-decoration: none; color: inherit; display: block;">
-                    {% if service.image %}
-                    <img src="{{ service.image.url }}" alt="{{ service.name }}" class="card-image">
-                    {% else %}
-                    <div class="card-image-placeholder">
-                        {{ service.category.icon|default:"✨" }}
-                    </div>
-                    {% endif %}
+
+                <!-- Service Image -->
+                <a href="{{ service.get_absolute_url }}"
+                   style="text-decoration: none; color: inherit; display: block; overflow: hidden;">
+
+                        <img
+                            src="{{ service.image_url }}"
+                            alt="{{ service.name }} — {{ service.category.name }} at GlowNest Beauty Studio"
+                            class="card-image"
+                        >
+
                 </a>
+
+
+                <!-- Service Details -->
                 <div class="card-body">
-                    <div class="card-category">{{ service.category.name }}</div>
+
+                    <div class="card-category">
+                        {{ service.category.name }}
+                    </div>
+
                     <h3 class="card-title">
-                        <a href="{{ service.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                        <a href="{{ service.get_absolute_url }}"
+                           style="text-decoration: none; color: inherit;">
                             {{ service.name }}
                         </a>
                     </h3>
+
                     <p class="card-description">
                         {{ service.short_description|default:service.description|truncatewords:22 }}
                     </p>
+
+                    <!-- Duration and Price -->
                     <div class="card-meta">
+
                         <div class="card-meta-item">
-                            <span class="meta-icon">⏱️</span>
-                            <span>{{ service.duration_display }}</span>
+                            <span class="meta-icon" aria-hidden="true">⏱</span>
+                            <span style="font-size: 0.9rem; font-weight: 500;">
+                                {{ service.duration_display }}
+                            </span>
                         </div>
-                        <div class="card-price">{{ service.price_display }}</div>
+
+                        <div class="card-price" role="text" aria-label="Price: {{ service.price_display }}">
+                            {{ service.price_display }}
+                        </div>
+
                     </div>
-                    <div style="margin-top: var(--space-md); display: flex; gap: var(--space-sm);">
-                        <a href="{% url 'appointments:book_appointment' %}?service={{ service.slug }}" class="btn btn-primary btn-sm" style="flex: 1;">
+
+
+                    <!-- Buttons -->
+                    <div
+                        style="
+                            margin-top: var(--space-md);
+                            display: flex;
+                            gap: var(--space-sm);
+                        "
+                    >
+
+                        <a
+                            href="{% url 'appointments:book_appointment' %}?service={{ service.slug }}"
+                            class="btn btn-primary btn-sm"
+                            style="flex: 1;"
+                        >
                             Book Now
                         </a>
-                        <a href="{{ service.get_absolute_url }}" class="btn btn-secondary btn-sm">
+
+
+                        <a
+                            href="{{ service.get_absolute_url }}"
+                            class="btn btn-secondary btn-sm"
+                        >
                             Details
                         </a>
+
                     </div>
+
                 </div>
+
             </div>
+
             {% empty %}
-            <div class="empty-state" style="grid-column: 1 / -1;">
-                <div class="empty-icon">🌸</div>
-                <h3>No Services Found</h3>
-                <p>No active services in this category at the moment. Please check back soon or browse other categories.</p>
-                <div style="margin-top: var(--space-lg);">
-                    <a href="{% url 'services:service_list' %}" class="btn btn-primary btn-sm">View All Services</a>
+
+            <!-- No Services -->
+            <div
+                class="empty-state"
+                style="grid-column: 1 / -1;"
+            >
+
+                <div class="empty-icon">
+                    🌸
                 </div>
+
+                <h3>
+                    No Services Found
+                </h3>
+
+                <p>
+                    No active services in this category at the moment.
+                    Please check back soon or browse other categories.
+                </p>
+
+                <div
+                    style="margin-top: var(--space-lg);"
+                >
+
+                    <a
+                        href="{% url 'services:service_list' %}"
+                        class="btn btn-primary btn-sm"
+                    >
+                        View All Services
+                    </a>
+
+                </div>
+
             </div>
+
             {% endfor %}
+
         </div>
+
     </div>
 </section>
 
-<!-- Bottom CTA -->
+
+<!-- Call To Action -->
 <section class="section cta-section">
+
     <div class="container">
+
         <div class="cta-content">
-            <h2>Ready to Glow?</h2>
-            <p>Select your favorite service and schedule your appointment in just a minute.</p>
+
+            <h2>
+                Ready to Glow?
+            </h2>
+
+            <p>
+                Select your favorite service and schedule your appointment
+                in just a minute.
+            </p>
+
+
             <div class="cta-buttons">
-                <a href="{% url 'appointments:book_appointment' %}" class="btn btn-primary btn-lg">Book an Appointment</a>
-                <a href="{% url 'appointments:contact' %}" class="btn btn-secondary btn-lg">Have Questions? Contact Us</a>
+
+                <a
+                    href="{% url 'appointments:book_appointment' %}"
+                    class="btn btn-primary btn-lg"
+                >
+                    Book an Appointment
+                </a>
+
+
+                <a
+                    href="{% url 'appointments:contact' %}"
+                    class="btn btn-secondary btn-lg"
+                >
+                    Have Questions? Contact Us
+                </a>
+
             </div>
+
         </div>
+
     </div>
+
 </section>
+
 {% endblock %}

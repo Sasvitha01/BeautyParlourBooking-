@@ -73,15 +73,31 @@ def available_slots_api(request):
     if not date_str:
         return Response({'error': 'date parameter is required'}, status=400)
 
+    from django.utils import timezone
+    from datetime import datetime
+    try:
+        query_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return Response({'error': 'Invalid date format (expected YYYY-MM-DD)'}, status=400)
+
+    now = timezone.localtime(timezone.now())
+    today = now.date()
+    current_time_str = now.strftime('%H:%M')
+
     booked = set(Appointment.objects.filter(
-        appointment_date=date_str,
+        appointment_date=query_date,
         status__in=['pending', 'confirmed'],
     ).values_list('appointment_time', flat=True))
 
-    slots = [
-        {'value': slot[0], 'label': slot[1], 'available': slot[0] not in booked}
-        for slot in Appointment.TIME_SLOTS
-    ]
+    slots = []
+    for slot in Appointment.TIME_SLOTS:
+        is_past = (query_date < today) or (query_date == today and slot[0] <= current_time_str)
+        slots.append({
+            'value': slot[0],
+            'label': slot[1],
+            'available': (not is_past) and (slot[0] not in booked)
+        })
+
     return Response({'date': date_str, 'slots': slots})
 
 

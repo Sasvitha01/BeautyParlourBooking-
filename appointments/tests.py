@@ -153,3 +153,52 @@ class AppointmentsCustomerFlowTests(TestCase):
         })
         self.assertEqual(response_invalid.status_code, 200)
         self.assertContains(response_invalid, 'No Appointment Found')
+
+    def test_past_date_booking_rejected(self):
+        past_date = date.today() - timedelta(days=1)
+        post_data = {
+            'full_name': 'Test Past User',
+            'phone': '+919876543210',
+            'email': 'past@example.com',
+            'service': self.service.pk,
+            'appointment_date': past_date.strftime('%Y-%m-%d'),
+            'appointment_time': '10:00',
+            'message': ''
+        }
+        response = self.client.post(reverse('appointments:book_appointment'), post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'You cannot book an appointment in the past')
+
+    def test_cancelled_appointment_releases_slot(self):
+        customer = Customer.objects.create(full_name='Cancel Tester', email='c@example.com', phone='+919876501234')
+        appointment = Appointment.objects.create(
+            customer=customer,
+            service=self.service,
+            appointment_date=self.booking_date,
+            appointment_time='12:00',
+            status='pending'
+        )
+
+        # Cancel the appointment
+        appointment.status = 'cancelled'
+        appointment.save()
+
+        # Slot should now be available in available_slots
+        date_str = self.booking_date.strftime('%Y-%m-%d')
+        response = self.client.get(reverse('appointments:available_slots'), {'date': date_str})
+        self.assertEqual(response.status_code, 200)
+        slots = [s['value'] for s in response.json()['slots']]
+        self.assertIn('12:00', slots)
+
+        # Booking the same slot should now succeed
+        post_data = {
+            'full_name': 'New Booker',
+            'phone': '+919876599999',
+            'email': 'new@example.com',
+            'service': self.service.pk,
+            'appointment_date': date_str,
+            'appointment_time': '12:00',
+            'message': ''
+        }
+        res = self.client.post(reverse('appointments:book_appointment'), post_data)
+        self.assertEqual(res.status_code, 302)
