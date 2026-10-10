@@ -254,25 +254,3 @@ def terms(request):
     return render(request, 'public/terms.html', {
         'page_title': 'Terms & Booking Policy',
     })
-
-
-def debug_status(request):
-    """Temporary diagnostic endpoint to identify production environment and DB status."""
-    from django.db import connection
-    from services.models import Service
-    res = {
-        'database_engine': connection.settings_dict.get('ENGINE'),
-        'database_host': connection.settings_dict.get('HOST', ''),
-        'database_name': str(connection.settings_dict.get('NAME', '')),
-    }
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1;")
-        res['db_connection'] = 'ok'
-    except Exception as e:
-        res['db_connection_error'] = f"{type(e).__name__}: {str(e)}"
-    try:
-        res['services_count'] = Service.objects.count()
-    except Exception as e:
-        res['services_query_error'] = f"{type(e).__name__}: {str(e)}"
-    return JsonResponse(res)

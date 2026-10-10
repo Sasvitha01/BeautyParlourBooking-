@@ -69,7 +69,7 @@ def create_appointment(request):
 @api_view(['GET'])
 def available_slots_api(request):
     """Get available time slots for a given date."""
-    date_str = request.query_params.get('date', '')
+    date_str = request.query_params.get('date', '').strip()
     if not date_str:
         return Response({'error': 'date parameter is required'}, status=400)
 
@@ -84,10 +84,13 @@ def available_slots_api(request):
     today = now.date()
     current_time_str = now.strftime('%H:%M')
 
-    booked = set(Appointment.objects.filter(
-        appointment_date=query_date,
-        status__in=['pending', 'confirmed'],
-    ).values_list('appointment_time', flat=True))
+    try:
+        booked = set(Appointment.objects.filter(
+            appointment_date=query_date,
+            status__in=['pending', 'confirmed'],
+        ).values_list('appointment_time', flat=True))
+    except Exception:
+        booked = set()
 
     slots = []
     for slot in Appointment.TIME_SLOTS:
