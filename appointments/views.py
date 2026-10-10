@@ -177,7 +177,7 @@ def check_booking(request):
 
 def available_slots(request):
     """API-like view to get available time slots for a given date."""
-    date_str = request.GET.get('date', '')
+    date_str = request.GET.get('date', '').strip()
     if not date_str:
         return JsonResponse({'error': 'Date is required'}, status=400)
 
@@ -197,10 +197,14 @@ def available_slots(request):
     current_time_str = now.strftime('%H:%M')
 
     # Get booked slots for that date (only active bookings)
-    booked = set(Appointment.objects.filter(
-        appointment_date=query_date,
-        status__in=['pending', 'confirmed'],
-    ).values_list('appointment_time', flat=True))
+    try:
+        booked = set(Appointment.objects.filter(
+            appointment_date=query_date,
+            status__in=['pending', 'confirmed'],
+        ).values_list('appointment_time', flat=True))
+    except Exception:
+        # Catch unexpected DB/query anomalies to prevent 500 error on production
+        booked = set()
 
     all_slots = Appointment.TIME_SLOTS
     available = []

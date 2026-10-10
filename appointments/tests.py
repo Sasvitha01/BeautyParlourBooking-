@@ -125,6 +125,41 @@ class AppointmentsCustomerFlowTests(TestCase):
         slot_values = [s['value'] for s in data['slots']]
         self.assertNotIn('10:00', slot_values)
         self.assertIn('10:30', slot_values)
+        self.assertEqual(data['booked_count'], 1)
+
+    def test_available_slots_missing_date(self):
+        response = self.client.get(reverse('appointments:available_slots'))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'error': 'Date is required'})
+
+    def test_available_slots_invalid_format(self):
+        for bad_date in ['invalid', '2026-13-45', 'not-a-date']:
+            response = self.client.get(reverse('appointments:available_slots'), {'date': bad_date})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'error': 'Invalid date format'})
+
+    def test_available_slots_past_date(self):
+        past_date = (date.today() - timedelta(days=5)).strftime('%Y-%m-%d')
+        response = self.client.get(reverse('appointments:available_slots'), {'date': past_date})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['slots'], [])
+        self.assertEqual(data['booked_count'], 0)
+        self.assertEqual(data['error'], 'Past dates cannot be booked.')
+
+    def test_available_slots_whitespace_handling(self):
+        date_str = f"  {self.booking_date.strftime('%Y-%m-%d')}  "
+        response = self.client.get(reverse('appointments:available_slots'), {'date': date_str})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('slots', response.json())
+
+    def test_available_slots_db_error_resilience(self):
+        from unittest.mock import patch
+        with patch('appointments.models.Appointment.objects.filter', side_effect=Exception('DB timeout')):
+            date_str = self.booking_date.strftime('%Y-%m-%d')
+            response = self.client.get(reverse('appointments:available_slots'), {'date': date_str})
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('slots', response.json())
 
     def test_check_booking_lookup(self):
         customer = Customer.objects.create(full_name='Maya Sen', email='maya@example.com', phone='+919876543210')
