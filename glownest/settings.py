@@ -78,9 +78,27 @@ WSGI_APPLICATION = 'glownest.wsgi.application'
 # Database
 DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
-    }
+    import re as _re
+    # Guard: strip square brackets from hostname if the URL was copy-pasted
+    # with IPv6-style brackets (e.g. postgresql://user:pass@[host]:5432/db).
+    # Python's urlsplit treats [] as IPv6 notation and raises ValueError when
+    # the content is a plain hostname, crashing Django startup on Render.
+    # The pattern only matches bracket content containing a dot (i.e. a hostname),
+    # so genuine IPv6 addresses (no dots) are left untouched.
+    _db_url = _re.sub(r'@\[([^\]]*\.[^\]]*)\]', lambda m: '@' + m.group(1), DATABASE_URL)
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(_db_url, conn_max_age=600, ssl_require=True)
+        }
+    except Exception as _db_url_err:
+        import sys
+        print(
+            f'[GlowNest] DATABASE_URL could not be parsed: {_db_url_err}\n'
+            f'Check that DATABASE_URL in your Render environment is a valid '
+            f'postgresql:// URL with no brackets around the hostname.',
+            file=sys.stderr,
+        )
+        raise
 else:
     DATABASES = {
         'default': {
