@@ -113,6 +113,13 @@ def sanitize_database_url(url: str) -> str:
     url = _re.sub(r':\[\s*([^\]@]+?)\s*\]@', r':\1@', url)
     url = _re.sub(r'//\[\s*([^\]@:]+?)\s*\]:', r'//\1:', url)
 
+    # Automatically route Supabase pooler to transaction mode (port 6543).
+    # Session mode (port 5432) has a strict limit of 15 concurrent clients:
+    # "FATAL: (EMAXCONNSESSION) max clients reached in session mode - max clients are limited to pool_size: 15".
+    # Transaction mode (port 6543) multiplexes queries per transaction, preventing connection pool exhaustion.
+    if 'pooler.supabase.com' in url:
+        url = _re.sub(r'(pooler\.supabase\.com)(?::5432)?(?=[/?]|$)', r'\g<1>:6543', url)
+
     return url
 
 

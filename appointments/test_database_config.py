@@ -42,10 +42,11 @@ class DatabaseUrlParsingTests(SimpleTestCase):
     def test_both_bracketed_password_and_bracketed_host(self):
         url = "postgresql://dummy_user:[dummy_pass]@[aws-0-ap-northeast-1.pooler.supabase.com]:5432/postgres"
         clean = sanitize_database_url(url)
-        self.assertEqual(clean, "postgresql://dummy_user:dummy_pass@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres")
+        # Port 5432 is automatically routed to transaction mode port 6543
+        self.assertEqual(clean, "postgresql://dummy_user:dummy_pass@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres")
         cfg = dj_database_url.parse(clean, conn_max_age=0, conn_health_checks=True, ssl_require=True)
         self.assertEqual(cfg['HOST'], 'aws-0-ap-northeast-1.pooler.supabase.com')
-        self.assertEqual(cfg['PORT'], 5432)
+        self.assertEqual(cfg['PORT'], 6543)
 
     def test_quoted_and_whitespace_url(self):
         url = '  "postgresql://dummy_user:dummy_pass@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres"  '
