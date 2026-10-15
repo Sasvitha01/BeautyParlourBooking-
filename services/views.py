@@ -8,17 +8,20 @@ from .models import Service, ServiceCategory
 
 def service_list(request):
     """Display all active services grouped by category."""
-    categories = ServiceCategory.objects.filter(is_active=True).prefetch_related(
-        'services'
-    )
     active_category = request.GET.get('category', '')
-
-    if active_category:
-        services = Service.objects.filter(
-            is_active=True, category__slug=active_category
-        ).select_related('category')
-    else:
-        services = Service.objects.filter(is_active=True).select_related('category')
+    try:
+        categories = list(ServiceCategory.objects.filter(is_active=True).prefetch_related('services'))
+        if active_category:
+            services = list(Service.objects.filter(
+                is_active=True, category__slug=active_category
+            ).select_related('category'))
+        else:
+            services = list(Service.objects.filter(is_active=True).select_related('category'))
+    except Exception as e:
+        import sys
+        sys.stderr.write(f"[service_list DB warning]: {e}\n")
+        categories = []
+        services = []
 
     return render(request, 'public/services.html', {
         'categories': categories,

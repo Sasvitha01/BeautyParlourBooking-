@@ -15,17 +15,22 @@ from .forms import AppointmentBookingForm, BookingLookupForm, ContactForm
 
 def home(request):
     """Homepage with hero, featured services, testimonials."""
-    featured_services = Service.objects.filter(
-        is_active=True, is_featured=True
-    ).select_related('category')[:6]
-
-    # If fewer than 6 featured, fill with active services
-    if featured_services.count() < 6:
-        featured_services = Service.objects.filter(
-            is_active=True
-        ).select_related('category')[:6]
-
-    categories = ServiceCategory.objects.filter(is_active=True)[:6]
+    try:
+        featured_services = list(
+            Service.objects.filter(is_active=True, is_featured=True).select_related('category')[:6]
+        )
+        if len(featured_services) < 6:
+            existing_ids = [s.id for s in featured_services]
+            additional = list(
+                Service.objects.filter(is_active=True).exclude(id__in=existing_ids).select_related('category')[:6 - len(featured_services)]
+            )
+            featured_services.extend(additional)
+        categories = list(ServiceCategory.objects.filter(is_active=True)[:6])
+    except Exception as e:
+        import sys
+        sys.stderr.write(f"[home view DB warning]: {e}\n")
+        featured_services = []
+        categories = []
 
     testimonials = [
         {

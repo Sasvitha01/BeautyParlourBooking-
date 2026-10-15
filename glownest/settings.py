@@ -129,7 +129,13 @@ if DATABASE_URL:
         )
     try:
         DATABASES = {
-            'default': dj_database_url.parse(_db_url, conn_max_age=600, ssl_require=True)
+            'default': dj_database_url.parse(
+                _db_url,
+                conn_max_age=0,
+                conn_health_checks=True,
+                disable_server_side_cursors=True,
+                ssl_require=True,
+            )
         }
     except Exception as _db_url_err:
         import sys
