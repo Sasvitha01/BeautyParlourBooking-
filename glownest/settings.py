@@ -75,17 +75,57 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'glownest.wsgi.application'
 
+def sanitize_database_url(url: str) -> str:
+    """
+    Sanitize database URLs to prevent startup crashes on Render/Supabase:
+    - Strips surrounding quotes and whitespace.
+    - Strips square brackets from domain hostnames (e.g. @[host]:port or @[host:port]).
+      Python's urllib.parse treats [] as IPv6 notation and raises ValueError when
+      the bracketed content is a plain hostname. Genuine IPv6 addresses are preserved.
+    - Strips square brackets from password or username (e.g. :[YOUR-PASSWORD]@ or :[secret]@)
+      which commonly occur when copy-pasting from Supabase connection strings.
+    """
+    if not url:
+        return url
+    import re as _re
+    url = url.strip().strip("'\"")
+
+    def _clean_host(match):
+        prefix = match.group(1) or ''
+        host = match.group(2).strip()
+        port = (match.group(3) or '').strip()
+        if ':' in host and not port:
+            h, p = host.split(':', 1)
+            return f"{prefix}{h.strip()}:{p.strip()}"
+        if port:
+            return f"{prefix}{host}:{port}"
+        return f"{prefix}{host}"
+
+    # Strip brackets around domain hostnames (with dots/hyphens, not IPv6 colons)
+    url = _re.sub(
+        r'(@|//)\[\s*([a-zA-Z0-9.\-_]+(?::\d+)?)\s*\](?::(\d+))?',
+        _clean_host,
+        url,
+    )
+
+    # Strip square brackets around password or username
+    url = _re.sub(r':\[\s*([^\]@]+?)\s*\]@', r':\1@', url)
+    url = _re.sub(r'//\[\s*([^\]@:]+?)\s*\]:', r'//\1:', url)
+
+    return url
+
+
 # Database
 DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
-    import re as _re
-    # Guard: strip square brackets from hostname if the URL was copy-pasted
-    # with IPv6-style brackets (e.g. postgresql://user:pass@[host]:5432/db).
-    # Python's urlsplit treats [] as IPv6 notation and raises ValueError when
-    # the content is a plain hostname, crashing Django startup on Render.
-    # The pattern only matches bracket content containing a dot (i.e. a hostname),
-    # so genuine IPv6 addresses (no dots) are left untouched.
-    _db_url = _re.sub(r'@\[([^\]]*\.[^\]]*)\]', lambda m: '@' + m.group(1), DATABASE_URL)
+    _db_url = sanitize_database_url(DATABASE_URL)
+    if 'YOUR-PASSWORD' in _db_url:
+        import sys
+        print(
+            '[GlowNest] WARNING: DATABASE_URL still contains placeholder "YOUR-PASSWORD". '
+            'Please update the DATABASE_URL environment variable in Render with your actual password.',
+            file=sys.stderr,
+        )
     try:
         DATABASES = {
             'default': dj_database_url.parse(_db_url, conn_max_age=600, ssl_require=True)
@@ -95,7 +135,7 @@ if DATABASE_URL:
         print(
             f'[GlowNest] DATABASE_URL could not be parsed: {_db_url_err}\n'
             f'Check that DATABASE_URL in your Render environment is a valid '
-            f'postgresql:// URL with no brackets around the hostname.',
+            f'postgresql:// URL without brackets.',
             file=sys.stderr,
         )
         raise
