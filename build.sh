@@ -11,3 +11,7 @@ python manage.py loaddata services/fixtures/initial_data.json || true
 
 # Ensure service images are assigned
 python assign_service_images.py || true
+
+# Ensure admin superuser exists
+python ensure_admin.py || true
+

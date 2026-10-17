@@ -79,48 +79,146 @@ WSGI_APPLICATION = 'glownest.wsgi.application'
 def sanitize_database_url(url: str) -> str:
     """
     Sanitize database URLs to prevent startup crashes on Render/Supabase:
-    - Strips surrounding quotes and whitespace.
+    - Strips surrounding quotes, backticks, angle brackets (<>), and outer square brackets ([]).
+    - Safely parses authority (userinfo and hostinfo) even if userinfo contains brackets or special characters.
     - Strips square brackets from domain hostnames (e.g. @[host]:port or @[host:port]).
       Python's urllib.parse treats [] as IPv6 notation and raises ValueError when
       the bracketed content is a plain hostname. Genuine IPv6 addresses are preserved.
-    - Strips square brackets from password or username (e.g. :[YOUR-PASSWORD]@ or :[secret]@)
-      which commonly occur when copy-pasting from Supabase connection strings.
+    - Strips square brackets from username and password (e.g. postgres.[project-ref]:[YOUR-PASSWORD]@
+      or [user]:[secret]@), which commonly occur when copy-pasting from Supabase connection strings.
+    - Safely percent-encodes passwords with reserved characters (like @, [, ], #, ?) so that
+      urllib.parse does not misinterpret them as host or scheme separators.
+    - Strips brackets from database name (e.g. /[postgres]).
+    - Automatically routes Supabase pooler connections (pooler.supabase.com) to transaction mode (port 6543)
+      if port 5432 or no port is specified, preventing EMAXCONNSESSION pool exhaustion.
     """
     if not url:
         return url
+
+    clean = url.strip()
+    while (
+        (clean.startswith('"') and clean.endswith('"')) or
+        (clean.startswith("'") and clean.endswith("'")) or
+        (clean.startswith('`') and clean.endswith('`')) or
+        (clean.startswith('<') and clean.endswith('>')) or
+        (clean.startswith('[') and clean.endswith(']'))
+    ):
+        clean = clean[1:-1].strip()
+
+    if clean.startswith('sqlite:') or clean.startswith('sqlite://'):
+        return clean
+
     import re as _re
-    url = url.strip().strip("'\"")
+    import ipaddress as _ipaddress
+    import urllib.parse as _urlparse
 
-    def _clean_host(match):
-        prefix = match.group(1) or ''
-        host = match.group(2).strip()
-        port = (match.group(3) or '').strip()
-        if ':' in host and not port:
-            h, p = host.split(':', 1)
-            return f"{prefix}{h.strip()}:{p.strip()}"
-        if port:
-            return f"{prefix}{host}:{port}"
-        return f"{prefix}{host}"
+    # Separate scheme
+    if '://' in clean:
+        scheme, rest = clean.split('://', 1)
+    else:
+        scheme = 'postgresql'
+        rest = clean
 
-    # Strip brackets around domain hostnames (with dots/hyphens, not IPv6 colons)
-    url = _re.sub(
-        r'(@|//)\[\s*([a-zA-Z0-9.\-_]+(?::\d+)?)\s*\](?::(\d+))?',
-        _clean_host,
-        url,
-    )
+    # Determine authority and the rest (path, query, fragment)
+    # The authority is terminated by the first '/' in rest.
+    if '/' in rest:
+        authority, pqf = rest.split('/', 1)
+        pqf = _re.sub(r'^\[\s*([^\]]+?)\s*\]', r'\1', pqf)
+        path_query_fragment = '/' + pqf
+    else:
+        if '@' in rest:
+            pre_at, post_at = rest.rsplit('@', 1)
+            m = _re.search(r'[?#]', post_at)
+            if m:
+                host_part = post_at[:m.start()]
+                path_query_fragment = post_at[m.start():]
+                authority = f"{pre_at}@{host_part}"
+            else:
+                authority = rest
+                path_query_fragment = ''
+        else:
+            m = _re.search(r'[?#]', rest)
+            if m:
+                authority = rest[:m.start()]
+                path_query_fragment = rest[m.start():]
+            else:
+                authority = rest
+                path_query_fragment = ''
 
-    # Strip square brackets around password or username
-    url = _re.sub(r':\[\s*([^\]@]+?)\s*\]@', r':\1@', url)
-    url = _re.sub(r'//\[\s*([^\]@:]+?)\s*\]:', r'//\1:', url)
+    # Separate userinfo and hostinfo (the last '@' separates credentials from host)
+    if '@' in authority:
+        userinfo, hostinfo = authority.rsplit('@', 1)
+        has_userinfo = True
+    else:
+        userinfo = ''
+        hostinfo = authority
+        has_userinfo = False
 
-    # Automatically route Supabase pooler to transaction mode (port 6543).
-    # Session mode (port 5432) has a strict limit of 15 concurrent clients:
-    # "FATAL: (EMAXCONNSESSION) max clients reached in session mode - max clients are limited to pool_size: 15".
-    # Transaction mode (port 6543) multiplexes queries per transaction, preventing connection pool exhaustion.
-    if 'pooler.supabase.com' in url:
-        url = _re.sub(r'(pooler\.supabase\.com)(?::5432)?(?=[/?]|$)', r'\g<1>:6543', url)
+    # Clean userinfo (user:password)
+    clean_userinfo = ''
+    if has_userinfo:
+        if ':' in userinfo:
+            raw_user, raw_pass = userinfo.split(':', 1)
+            clean_user = _re.sub(r'\[\s*([^\]]+?)\s*\]', r'\1', raw_user.strip())
 
-    return url
+            clean_pass = raw_pass.strip()
+            if clean_pass.startswith('[') and clean_pass.endswith(']'):
+                clean_pass = clean_pass[1:-1].strip()
+
+            unquoted_pass = _urlparse.unquote(clean_pass)
+            safe_pass = _urlparse.quote(unquoted_pass, safe='')
+
+            unquoted_user = _urlparse.unquote(clean_user)
+            safe_user = _urlparse.quote(unquoted_user, safe='.')
+            clean_userinfo = f'{safe_user}:{safe_pass}@'
+        else:
+            clean_user = _re.sub(r'\[\s*([^\]]+?)\s*\]', r'\1', userinfo.strip())
+            safe_user = _urlparse.quote(_urlparse.unquote(clean_user), safe='.')
+            clean_userinfo = f'{safe_user}@'
+
+    # Clean hostinfo
+    hostinfo = hostinfo.strip()
+    is_ipv6_literal = False
+    clean_host = ''
+    clean_port = ''
+
+    if hostinfo.startswith('['):
+        bracket_content, _, after_bracket = hostinfo[1:].partition(']')
+        bracket_content = bracket_content.strip()
+        try:
+            ip = _ipaddress.ip_address(bracket_content)
+            if isinstance(ip, _ipaddress.IPv6Address):
+                is_ipv6_literal = True
+        except ValueError:
+            is_ipv6_literal = False
+
+        if is_ipv6_literal:
+            clean_host = f'[{bracket_content}]'
+            clean_port = after_bracket.lstrip(':').strip()
+        else:
+            if ':' in bracket_content:
+                clean_host, clean_port = bracket_content.rsplit(':', 1)
+            else:
+                clean_host = bracket_content
+                clean_port = after_bracket.lstrip(':').strip()
+    else:
+        if ':' in hostinfo:
+            clean_host, clean_port = hostinfo.rsplit(':', 1)
+        else:
+            clean_host = hostinfo
+            clean_port = ''
+
+    if not is_ipv6_literal:
+        clean_host = clean_host.strip().strip('[]')
+    clean_port = clean_port.strip().strip('[]')
+
+    # Supabase pooler handling: auto-route to transaction mode (port 6543)
+    if 'pooler.supabase.com' in clean_host:
+        if clean_port == '5432' or not clean_port:
+            clean_port = '6543'
+
+    port_str = f':{clean_port}' if clean_port else ''
+    return f'{scheme}://{clean_userinfo}{clean_host}{port_str}{path_query_fragment}'
 
 
 # Database
@@ -132,6 +230,13 @@ if DATABASE_URL:
         print(
             '[GlowNest] WARNING: DATABASE_URL still contains placeholder "YOUR-PASSWORD". '
             'Please update the DATABASE_URL environment variable in Render with your actual password.',
+            file=sys.stderr,
+        )
+    if 'project-ref' in _db_url or 'YOUR-PROJECT-REF' in _db_url:
+        import sys
+        print(
+            '[GlowNest] WARNING: DATABASE_URL contains placeholder "project-ref". '
+            'Please update the DATABASE_URL environment variable in Render with your actual Supabase project reference.',
             file=sys.stderr,
         )
     try:
@@ -147,9 +252,7 @@ if DATABASE_URL:
     except Exception as _db_url_err:
         import sys
         print(
-            f'[GlowNest] DATABASE_URL could not be parsed: {_db_url_err}\n'
-            f'Check that DATABASE_URL in your Render environment is a valid '
-            f'postgresql:// URL without brackets.',
+            f'[GlowNest] DATABASE_URL parsing warning via dj_database_url: {_db_url_err}',
             file=sys.stderr,
         )
         raise
