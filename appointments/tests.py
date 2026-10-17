@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.contrib.auth.models import User
 from services.models import ServiceCategory, Service
 from appointments.models import Appointment, Customer
 
@@ -237,3 +238,97 @@ class AppointmentsCustomerFlowTests(TestCase):
         }
         res = self.client.post(reverse('appointments:book_appointment'), post_data)
         self.assertEqual(res.status_code, 302)
+
+
+class DjangoAdminAccessTests(TestCase):
+    """Tests for Django Admin access control and customer booking visibility."""
+
+    def setUp(self):
+        self.client = Client()
+        self.category = ServiceCategory.objects.create(
+            name='Nail Art',
+            slug='nail-art',
+            icon='💅',
+            is_active=True
+        )
+        self.service = Service.objects.create(
+            category=self.category,
+            name='Gel Manicure',
+            slug='gel-manicure',
+            description='Long lasting gel polish.',
+            short_description='Gel nails',
+            price=1200.00,
+            duration_minutes=45,
+            is_active=True
+        )
+        self.customer = Customer.objects.create(
+            full_name='Priya Sharma',
+            email='priya@example.com',
+            phone='+919876543210'
+        )
+        self.appointment = Appointment.objects.create(
+            customer=self.customer,
+            service=self.service,
+            appointment_date=date.today() + timedelta(days=3),
+            appointment_time='14:00',
+            status='pending'
+        )
+        self.staff_user = User.objects.create_superuser(
+            username='admin_staff',
+            email='admin@test.com',
+            password='securepassword123'
+        )
+        self.non_staff_user = User.objects.create_user(
+            username='regular_customer',
+            password='customerpass123',
+            is_staff=False,
+            is_active=True
+        )
+
+    def test_anonymous_user_cannot_access_admin_portal(self):
+        # /admin/ must redirect unauthenticated visitors to login
+        response = self.client.get('/admin/')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/admin/login/', response.url)
+
+        # /admin/appointments/appointment/ must also redirect
+        detail_response = self.client.get('/admin/appointments/appointment/')
+        self.assertEqual(detail_response.status_code, 302)
+        self.assertIn('/admin/login/', detail_response.url)
+
+    def test_non_staff_user_cannot_access_admin_portal(self):
+        self.client.login(username='regular_customer', password='customerpass123')
+        response = self.client.get('/admin/')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/admin/login/', response.url)
+
+        appts_response = self.client.get('/admin/appointments/appointment/')
+        self.assertEqual(appts_response.status_code, 302)
+
+    def test_authenticated_staff_can_access_admin_and_view_booking_details(self):
+        self.client.login(username='admin_staff', password='securepassword123')
+
+        # Admin root
+        response = self.client.get('/admin/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Site administration')
+        self.assertContains(response, 'Appointments')
+
+        # Appointment changelist view
+        appts_response = self.client.get('/admin/appointments/appointment/')
+        self.assertEqual(appts_response.status_code, 200)
+
+        # Verify all required booking fields are visible to admin
+        self.assertContains(appts_response, self.appointment.booking_id)
+        self.assertContains(appts_response, 'Priya Sharma')      # Customer Name
+        self.assertContains(appts_response, '+919876543210')     # Phone Number
+        self.assertContains(appts_response, 'Gel Manicure')      # Selected Service
+        self.assertContains(appts_response, '02:00 PM')          # Time (display label)
+        self.assertContains(appts_response, 'Pending')           # Booking Status
+
+    def test_django_admin_alias_route_works(self):
+        self.client.login(username='admin_staff', password='securepassword123')
+        response = self.client.get('/django-admin/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Site administration')
+
