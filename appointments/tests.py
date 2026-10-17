@@ -332,3 +332,96 @@ class DjangoAdminAccessTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Site administration')
 
+
+class SitemapTests(TestCase):
+    """
+    Verify that /sitemap.xml returns valid XML and uses only the correct
+    canonical production domain (beautyparlourbooking-2.onrender.com).
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.category = ServiceCategory.objects.create(
+            name='Hair Care',
+            slug='hair-care-sitemap',
+            icon='💇',
+            is_active=True
+        )
+        self.service = Service.objects.create(
+            category=self.category,
+            name='Keratin Treatment',
+            slug='keratin-treatment-sitemap',
+            description='Smooth and shiny hair.',
+            short_description='Keratin',
+            price=3500.00,
+            duration_minutes=90,
+            is_active=True
+        )
+
+    def test_sitemap_returns_200_and_xml(self):
+        response = self.client.get('/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
+        content_type = response.get('Content-Type', '')
+        self.assertIn('xml', content_type,
+                      msg=f"Expected XML Content-Type, got: {content_type}")
+
+    def test_sitemap_contains_correct_domain(self):
+        """Sitemap must use beautyparlourbooking-2, not beautyparlourbooking-3."""
+        response = self.client.get('/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode('utf-8')
+        self.assertIn(
+            'beautyparlourbooking-2.onrender.com', content,
+            msg="Sitemap must include URLs with the -2 domain."
+        )
+        self.assertNotIn(
+            'beautyparlourbooking-3.onrender.com', content,
+            msg="Sitemap must NOT include URLs with the wrong -3 domain."
+        )
+
+    def test_sitemap_contains_required_public_pages(self):
+        """Sitemap must list all key public pages."""
+        response = self.client.get('/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode('utf-8')
+        expected_paths = ['/', '/services/', '/about/', '/contact/', '/book/', '/privacy/', '/terms/']
+        for path in expected_paths:
+            self.assertIn(
+                path, content,
+                msg=f"Sitemap is missing expected path: {path}"
+            )
+
+    def test_sitemap_contains_active_service_detail_pages(self):
+        """Active service detail pages must appear in the sitemap."""
+        response = self.client.get('/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode('utf-8')
+        self.assertIn('keratin-treatment-sitemap', content,
+                      msg="Active service slug must appear in sitemap.")
+
+    def test_sitemap_excludes_admin_and_private_pages(self):
+        """Admin, dashboard, and booking confirmation pages must never appear."""
+        response = self.client.get('/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode('utf-8')
+        for forbidden in ['/admin/', '/admin-dashboard/', '/booking/']:
+            self.assertNotIn(
+                forbidden, content,
+                msg=f"Sitemap must NOT include private path: {forbidden}"
+            )
+
+    def test_sitemap_uses_https_protocol(self):
+        """All sitemap <loc> URLs must use HTTPS (not plain HTTP)."""
+        response = self.client.get('/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode('utf-8')
+        # Extract only <loc> values — the XML namespace may legitimately
+        # contain http:// URIs, so we check URLs specifically.
+        import re
+        locs = re.findall(r'<loc>(.*?)</loc>', content)
+        self.assertTrue(len(locs) > 0, msg="Sitemap must contain at least one <loc> element.")
+        for loc in locs:
+            self.assertTrue(
+                loc.startswith('https://'),
+                msg=f"Sitemap <loc> must use HTTPS, got: {loc}"
+            )

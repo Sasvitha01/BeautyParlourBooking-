@@ -15,12 +15,17 @@ python assign_service_images.py || true
 # Ensure admin superuser exists
 python ensure_admin.py || true
 
-# Update the Django Site record to use the actual deployment domain
+# Update the Django Site record to use the canonical deployment domain
 # so that /sitemap.xml emits correct absolute URLs.
+# Priority order:
+#   1. SITE_DOMAIN env var (set explicitly in Render dashboard)
+#   2. Hardcoded correct production domain
+# We intentionally ignore RENDER_EXTERNAL_HOSTNAME here because it resolves
+# to the internal Render service slug, which may differ from the public URL.
 python manage.py shell -c "
 from django.contrib.sites.models import Site
 import os
-hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'beautyparlourbooking-2.onrender.com')
+hostname = os.environ.get('SITE_DOMAIN', 'beautyparlourbooking-2.onrender.com')
 site = Site.objects.get_or_create(id=1)[0]
 site.domain = hostname
 site.name = 'GlowNest Beauty Studio'

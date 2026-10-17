@@ -349,6 +349,12 @@ LOGIN_REDIRECT_URL = '/admin-dashboard/'
 # WhatsApp Number
 WHATSAPP_NUMBER = os.getenv('WHATSAPP_NUMBER', '+911234567890')
 
+# Canonical public domain used by the sitemap.
+# Set SITE_DOMAIN in Render's environment variables to the exact live URL
+# hostname (without protocol or trailing slash) to ensure /sitemap.xml
+# always emits the correct absolute URLs, regardless of RENDER_EXTERNAL_HOSTNAME.
+SITE_DOMAIN = os.getenv('SITE_DOMAIN', 'beautyparlourbooking-2.onrender.com')
+
 # Security settings for production
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
