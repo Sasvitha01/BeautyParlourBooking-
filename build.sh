@@ -15,3 +15,15 @@ python assign_service_images.py || true
 # Ensure admin superuser exists
 python ensure_admin.py || true
 
+# Update the Django Site record to use the actual deployment domain
+# so that /sitemap.xml emits correct absolute URLs.
+python manage.py shell -c "
+from django.contrib.sites.models import Site
+import os
+hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'beautyparlourbooking-2.onrender.com')
+site = Site.objects.get_or_create(id=1)[0]
+site.domain = hostname
+site.name = 'GlowNest Beauty Studio'
+site.save()
+print(f'[GlowNest] Site domain set to: {hostname}')
+" || true

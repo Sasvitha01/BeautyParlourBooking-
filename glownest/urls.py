@@ -8,11 +8,19 @@ from django.conf.urls.static import static
 from django.views.static import serve
 
 from django.views.generic import RedirectView
+from django.contrib.sitemaps.views import sitemap
+from glownest.sitemaps import StaticPagesSitemap, ServiceDetailSitemap
+
+sitemaps = {
+    'static': StaticPagesSitemap,
+    'services': ServiceDetailSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('django-admin/<path:subpath>', RedirectView.as_view(url='/admin/%(subpath)s', permanent=True)),
     path('django-admin/', RedirectView.as_view(url='/admin/', permanent=True)),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('', include('appointments.urls')),
     path('services/', include('services.urls')),
     path('admin-dashboard/', include('dashboard.urls')),
